@@ -1,0 +1,243 @@
+/* ===================================================================
+   SEHAYAK (सहायक) - Dyslexia & Universal Accessibility Suite (WCAG 2.1 AA / AAA)
+   =================================================================== */
+
+/* Visdeurbel Typography: Bricolage Grotesque (Headings & Display) & PT Sans (Body) + Lexend (Accessibility) */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;500;600;700;800&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Lexend:wght@300;400;500;600;700&display=swap');
+
+/* Web-safe OpenDyslexic CDN Fallback */
+@font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/opendyslexic/0.91.0/fonts/OpenDyslexic-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    /* Visdeurbel.nl Typography Stack */
+    --font-heading: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-body: 'PT Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-family-current: var(--font-body);
+    --font-size-base: 16px;
+    --line-height-base: 1.6;
+    --letter-spacing-base: 0.01em;
+    --word-spacing-base: 0.04em;
+
+    /* Visdeurbel.nl Authentic Color Palette & Tokens */
+    /* Primary Canvas: Warm oat-cream reduces optical glare and visual stress (Irlen / Dyslexia) */
+    --bg-body: #FDF7EF;
+    --bg-surface: #FFFFFF;
+    --bg-surface-alt: #F8E7CD;
+    --border-color: #EADBC8;
+    --border-color-dark: #01463C;
+    --text-primary: #01463C;
+    --text-secondary: #1F5F55;
+    --text-muted: #537D75;
+
+    /* Visdeurbel Signature Accents */
+    --accent-primary: #9B74FF;
+    --accent-primary-hover: #8257E5;
+    --accent-primary-light: #ECE5FF;
+    --accent-forest: #01463C;
+    --accent-forest-dark: #033932;
+    --accent-gold: #F0AF00;
+    --accent-teal: #1EACB0;
+    --accent-coral: #FF6B6B;
+
+    /* Pedagogical Status Badges (Color-blind friendly) */
+    --badge-priority-bg: #FEF2F2;
+    --badge-priority-border: #FCA5A5;
+    --badge-priority-text: #991B1B;
+    --badge-priority-icon: #DC2626;
+
+    --badge-guided-bg: #FFFBEB;
+    --badge-guided-border: #FCD34D;
+    --badge-guided-text: #92400E;
+    --badge-guided-icon: #D97706;
+
+    --badge-ontrack-bg: #ECFDF5;
+    --badge-ontrack-border: #6EE7B7;
+    --badge-ontrack-text: #065F46;
+    --badge-ontrack-icon: #059669;
+
+    --focus-ring: 3px solid #01463C;
+}
+
+/* ---------------- Themes ---------------- */
+
+/* Theme 2: Pastel Ochre */
+body.theme-pastel-yellow {
+    --bg-body: #FAF6E9;
+    --bg-surface: #FFFDF5;
+    --bg-surface-alt: #F2EBD6;
+    --border-color: #E2D9BF;
+    --text-primary: #302A20;
+    --text-secondary: #5E5343;
+}
+
+/* Theme 3: Pastel Sky */
+body.theme-pastel-blue {
+    --bg-body: #F0F6FB;
+    --bg-surface: #FFFFFF;
+    --bg-surface-alt: #E3EEF8;
+    --border-color: #CADDF0;
+    --text-primary: #1C2D42;
+    --text-secondary: #475E7B;
+}
+
+/* Theme 4: High Contrast (Low Vision / Dark Mode) */
+body.theme-high-contrast {
+    --bg-body: #121212;
+    --bg-surface: #1E1E1E;
+    --bg-surface-alt: #2D2D2D;
+    --border-color: #FFFF00;
+    --text-primary: #FFFFFF;
+    --text-secondary: #FFFFE0;
+    --text-muted: #E0E0E0;
+    --accent-primary: #FFFF00;
+    --accent-primary-hover: #E6E600;
+    --accent-primary-light: #333300;
+    --focus-ring: 3px solid #FFFF00;
+
+    --badge-priority-bg: #400000;
+    --badge-priority-border: #FF6666;
+    --badge-priority-text: #FFFFFF;
+
+    --badge-guided-bg: #403000;
+    --badge-guided-border: #FFCC00;
+    --badge-guided-text: #FFFFFF;
+
+    --badge-ontrack-bg: #00331A;
+    --badge-ontrack-border: #33FF99;
+    --badge-ontrack-text: #FFFFFF;
+}
+
+/* Theme 5: Clean Neutral White */
+body.theme-clean-white {
+    --bg-body: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-surface-alt: #F1F5F9;
+    --border-color: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+}
+
+/* ---------------- Color Overlays (Irlen Syndrome Filters) ---------------- */
+#color-tint-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9998;
+    transition: background-color 0.3s ease;
+}
+
+body.tint-rose #color-tint-overlay {
+    background-color: rgba(254, 205, 211, 0.22);
+}
+
+body.tint-aqua #color-tint-overlay {
+    background-color: rgba(167, 243, 208, 0.20);
+}
+
+body.tint-yellow #color-tint-overlay {
+    background-color: rgba(254, 240, 138, 0.25);
+}
+
+body.tint-lavender #color-tint-overlay {
+    background-color: rgba(233, 213, 255, 0.22);
+}
+
+/* ---------------- Dyslexia Reading Ruler (Focus Guide) ---------------- */
+#dyslexia-reading-ruler {
+    display: none;
+    position: fixed;
+    left: 0;
+    width: 100vw;
+    height: 48px;
+    background: rgba(254, 240, 138, 0.35);
+    border-top: 2px solid #D97706;
+    border-bottom: 2px solid #D97706;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 0 1000vmax rgba(0, 0, 0, 0.18);
+    transition: height 0.15s ease;
+}
+
+body.ruler-active #dyslexia-reading-ruler {
+    display: block;
+}
+
+/* ---------------- Core Typography Rules ---------------- */
+
+body {
+    font-family: var(--font-family-current);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    letter-spacing: var(--letter-spacing-base);
+    word-spacing: var(--word-spacing-base);
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    text-align: left !important; /* WCAG 2.1 Rule: Never justify text for dyslexic readers */
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+p, li, dd, dt, th, td {
+    text-align: left !important;
+}
+
+/* Visdeurbel Typography (Bricolage Grotesque + PT Sans) */
+body.font-visdeurbel, body:not(.font-opendyslexic):not(.font-lexend):not(.font-sans) {
+    --font-family-current: 'PT Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+body.font-visdeurbel h1, body.font-visdeurbel h2, body.font-visdeurbel h3, body.font-visdeurbel h4, body.font-visdeurbel h5, body.font-visdeurbel h6,
+body:not(.font-opendyslexic):not(.font-lexend) h1, body:not(.font-opendyslexic):not(.font-lexend) h2, body:not(.font-opendyslexic):not(.font-lexend) h3, body:not(.font-opendyslexic):not(.font-lexend) h4, body:not(.font-opendyslexic):not(.font-lexend) h5, body:not(.font-opendyslexic):not(.font-lexend) h6,
+body:not(.font-opendyslexic):not(.font-lexend) .brand-text h1, body:not(.font-opendyslexic):not(.font-lexend) .card-title, body:not(.font-opendyslexic):not(.font-lexend) .kpi-value, body:not(.font-opendyslexic):not(.font-lexend) .btn {
+    font-family: 'Bricolage Grotesque', sans-serif !important;
+}
+
+/* OpenDyslexic Override */
+body.font-opendyslexic, body.font-opendyslexic * {
+    font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+/* Lexend Override */
+body.font-lexend, body.font-lexend * {
+    font-family: 'Lexend', sans-serif !important;
+}
+
+/* Standard Sans Override */
+body.font-sans, body.font-sans * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Keyboard Accessibility Focus Visible (WCAG 2.4.7) */
+*:focus-visible {
+    outline: var(--focus-ring) !important;
+    outline-offset: 3px !important;
+}
+
+/* Screen reader only utility class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Reading ruler / highlight when TTS is reading */
+.tts-speaking {
+    background-color: rgba(254, 240, 138, 0.45) !important;
+    border-left: 4px solid #D97706 !important;
+    padding-left: 8px !important;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}

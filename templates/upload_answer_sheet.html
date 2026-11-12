@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 980px; margin: 1rem auto;">
+    <div style="margin-bottom: 2rem;">
+        <a href="{{ url_for('answer_sheets_list') }}" style="font-size: 0.92rem; color: #01463C; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+            &larr; Back to Answer Sheets List
+        </a>
+        <h2 style="font-size: 1.85rem; font-weight: 800; color: #01463C; margin-top: 0.2rem; letter-spacing: -0.02em;">
+            Upload & Grade Student Answer Sheet Front-Cover
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            Record student question sequence marks (Q1-Q15 for 50 Marks), upload the front cover scan, and document diagnostic observations on weaknesses and improvements.
+        </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('upload_answer_sheet_view') }}" enctype="multipart/form-data">
+        <!-- 1. Student & Examination Information Card -->
+        <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+            <div class="card-title">1. Candidate & Examination Particulars</div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                <!-- Student Picker -->
+                <div>
+                    <label for="student_id" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Select Student from Your Cohort *
+                    </label>
+                    <select id="student_id" name="student_id" required style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                        {% for s in students %}
+                        <option value="{{ s.student_id }}">
+                            {{ s.name }} ({{ s.student_id }}) - Class {{ s.grade }}-{{ s.section }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Subject Picker -->
+                <div>
+                    <label for="subject" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Subject *
+                    </label>
+                    <select id="subject" name="subject" required style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                        <option value="Social Science">Social Science</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                    </select>
+                </div>
+
+                <!-- Exam Name -->
+                <div>
+                    <label for="exam_name" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Examination Name *
+                    </label>
+                    <input type="text" id="exam_name" name="exam_name" value="Half Yearly Examination (2026-2027)" required
+                           style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                </div>
+
+                <!-- Roll Number -->
+                <div>
+                    <label for="roll_no" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Candidate Roll No (in figures) *
+                    </label>
+                    <input type="text" id="roll_no" name="roll_no" value="2026001" required placeholder="e.g. 2026001"
+                           style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                </div>
+
+                <!-- Medium -->
+                <div>
+                    <label for="medium" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Medium of Examination
+                    </label>
+                    <select id="medium" name="medium" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                    </select>
+                </div>
+
+                <!-- Associated Question Paper -->
+                <div>
+                    <label for="question_paper_id" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Associated Question Paper
+                    </label>
+                    <select id="question_paper_id" name="question_paper_id" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                        {% for qp in question_papers %}
+                        <option value="{{ qp.id }}">{{ qp.title }} ({{ qp.grade }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Front-Sheet Image File Upload -->
+            <div style="padding: 1.25rem; background: var(--bg-surface-alt); border-radius: 18px; border: 2px dashed #01463C;">
+                <label for="sheet_image" style="display: block; font-weight: 800; font-size: 0.92rem; margin-bottom: 0.3rem; color: #01463C;">
+                    Upload Front-Page Scan / Photo of Answer Sheet (Optional)
+                </label>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.65rem;">
+                    Leave blank to automatically use the official CBSE model front-sheet layout with digital stamps.
+                </p>
+                <input type="file" id="sheet_image" name="sheet_image" accept="image/*,.pdf" style="font-size: 0.9rem;">
+            </div>
+        </div>
+
+        <!-- 2. Dual Question Sequence & Marks Obtained Grid (Questions 1 to 15 • 50 Marks) -->
+        <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C; letter-spacing: -0.01em;">
+                        2. Question Sequence & Marks Obtained Tabulation (Q1 to Q15 &bull; 50 Marks)
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Official Sequence: Q1-Q5 (1 Mark each), Q6-Q10 (2 Marks each), Q11-Q13 (5 Marks each), Q14-Q15 (10 Marks each).
+                    </p>
+                </div>
+
+                <div style="background: #FFFFFF; border: 2.5px solid #01463C; padding: 0.6rem 1.25rem; border-radius: 16px; box-shadow: 0 3px 0 #01463C;">
+                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Marks:</span>
+                    <strong id="live-total-display" style="font-size: 1.4rem; color: #DC2626; margin-left: 0.5rem;">0.0 / 50</strong>
+                </div>
+            </div>
+
+            <!-- Rubric Guide Summary Pills -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div style="background: #FFFFFF; border: 2px solid #01463C; padding: 0.6rem 0.85rem; border-radius: 14px; font-size: 0.85rem; box-shadow: 0 2px 0 #01463C;">
+                    <strong>Q1 &ndash; Q5:</strong> 1 Mark each (5M Max)
+                </div>
+                <div style="background: #FFFFFF; border: 2px solid #01463C; padding: 0.6rem 0.85rem; border-radius: 14px; font-size: 0.85rem; box-shadow: 0 2px 0 #01463C;">
+                    <strong>Q6 &ndash; Q10:</strong> 2 Marks each (10M Max)
+                </div>
+                <div style="background: #FFFFFF; border: 2px solid #01463C; padding: 0.6rem 0.85rem; border-radius: 14px; font-size: 0.85rem; box-shadow: 0 2px 0 #01463C;">
+                    <strong>Q11 &ndash; Q13:</strong> 5 Marks each (15M Max)
+                </div>
+                <div style="background: #FFFFFF; border: 2px solid #01463C; padding: 0.6rem 0.85rem; border-radius: 14px; font-size: 0.85rem; box-shadow: 0 2px 0 #01463C;">
+                    <strong>Q14 &ndash; Q15:</strong> 10 Marks each (20M Max)
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; border: 2px solid #01463C; padding: 1.25rem; border-radius: 20px; background: var(--bg-surface-alt);">
+                <!-- LEFT COLUMN: Questions 1 to 8 -->
+                <div>
+                    <div style="background: #FFFFFF; border: 2px solid #01463C; font-weight: 800; font-size: 0.9rem; padding: 0.5rem 0.75rem; text-align: center; border-radius: 12px 12px 0 0; color: #01463C;">
+                        Questions Sequence: 1 to 8
+                    </div>
+                    <div style="background: #FFFFFF; border: 2px solid #01463C; border-top: none; border-radius: 0 0 12px 12px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #01463C; background: var(--bg-surface-alt);">
+                                    <th style="padding: 0.5rem; text-align: center; width: 30%;">Q. No.</th>
+                                    <th style="padding: 0.5rem; text-align: center; width: 30%;">Max Rubric</th>
+                                    <th style="padding: 0.5rem; text-align: center; width: 40%; color: #DC2626;">Marks Awarded</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for q in range(1, 9) %}
+                                {% set q_max = 1.0 if q <= 5 else 2.0 %}
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td style="padding: 0.45rem 0.5rem; text-align: center; font-weight: 800; color: #01463C;">Q{{ q }}</td>
+                                    <td style="padding: 0.45rem 0.5rem; text-align: center; font-size: 0.82rem; color: var(--text-secondary);">{{ q_max|int }} Mark{% if q_max > 1 %}s{% endif %}</td>
+                                    <td style="padding: 0.45rem 0.5rem; text-align: center;">
+                                        <input type="number" step="0.5" min="0" max="{{ q_max }}" name="q_{{ q }}" class="q-mark-input"
+                                               value="{{ q_max }}"
+                                               style="width: 80px; text-align: center; padding: 0.35rem; border-radius: 8px; border: 1.5px solid #01463C; font-weight: 800; color: #DC2626;">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Questions 9 to 15 -->
+                <div>
+                    <div style="background: #FFFFFF; border: 2px solid #01463C; font-weight: 800; font-size: 0.9rem; padding: 0.5rem 0.75rem; text-align: center; border-radius: 12px 12px 0 0; color: #01463C;">
+                        Questions Sequence: 9 to 15
+                    </div>
+                    <div style="background: #FFFFFF; border: 2px solid #01463C; border-top: none; border-radius: 0 0 12px 12px; overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #01463C; background: var(--bg-surface-alt);">
+                                    <th style="padding: 0.5rem; text-align: center; width: 30%;">Q. No.</th>
+                                    <th style="padding: 0.5rem; text-align: center; width: 30%;">Max Rubric</th>
+                                    <th style="padding: 0.5rem; text-align: center; width: 40%; color: #DC2626;">Marks Awarded</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for q in range(9, 16) %}
+                                {% set q_max = 2.0 if q <= 10 else (5.0 if q <= 13 else 10.0) %}
+                                <tr style="border-bottom: 1px solid var(--border-color);">
+                                    <td style="padding: 0.45rem 0.5rem; text-align: center; font-weight: 800; color: #01463C;">Q{{ q }}</td>
+                                    <td style="padding: 0.45rem 0.5rem; text-align: center; font-size: 0.82rem; color: var(--text-secondary);">{{ q_max|int }} Marks</td>
+                                    <td style="padding: 0.45rem 0.5rem; text-align: center;">
+                                        <input type="number" step="0.5" min="0" max="{{ q_max }}" name="q_{{ q }}" class="q-mark-input"
+                                               value="{{ (q_max * 0.8)|round(1) if q_max > 2 else q_max }}"
+                                               style="width: 80px; text-align: center; padding: 0.35rem; border-radius: 8px; border: 1.5px solid #01463C; font-weight: 800; color: #DC2626;">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Teacher Diagnostic Remarks: Weaknesses, Improvements & Recommendations -->
+        <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+            <div class="card-title">
+                <span>3. Teacher Diagnostic Remarks & Observed Growth</span>
+                <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Required for Remedial Tailoring</span>
+            </div>
+
+            <!-- Observed Weaknesses -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="teacher_weaknesses" style="display: block; font-weight: 800; font-size: 0.92rem; color: #991B1B; margin-bottom: 0.4rem;">
+                    Where Weaknesses & Learning Gaps Were Observed (According to Teacher):
+                </label>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.45rem;">
+                    Note down specific question numbers, conceptual misunderstandings, or signs of reading fatigue.
+                </p>
+                <textarea id="teacher_weaknesses" name="teacher_weaknesses" rows="3" required
+                          placeholder="e.g. Questions 3, 5, 8, 12: Struggles with multi-step fraction division and long word problems. Noticeable reading fatigue in Section B..."
+                          style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #DC2626; background: #FFF5F5; font-family: inherit; font-size: 0.95rem;"></textarea>
+            </div>
+
+            <!-- Observed Improvements -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="teacher_improvements" style="display: block; font-weight: 800; font-size: 0.92rem; color: #065F46; margin-bottom: 0.4rem;">
+                    Where Improvements & Growth Were Observed (According to Teacher):
+                </label>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.45rem;">
+                    Highlight conceptual progress, neatness of steps, formula recall, or resilience shown by the student.
+                </p>
+                <textarea id="teacher_improvements" name="teacher_improvements" rows="3" required
+                          placeholder="e.g. Questions 1, 2, 4, 9, 14: Solid grasp of geometric angle rules and one-step equations. Step clarity improved compared to FA1..."
+                          style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #059669; background: #F0FDF4; font-family: inherit; font-size: 0.95rem;"></textarea>
+            </div>
+
+            <!-- General Recommendations -->
+            <div style="margin-bottom: 1.5rem;">
+                <label for="teacher_general_remarks" style="display: block; font-weight: 800; font-size: 0.92rem; color: #01463C; margin-bottom: 0.4rem;">
+                    Actionable Remedial Recommendations & PTM Guidance:
+                </label>
+                <textarea id="teacher_general_remarks" name="teacher_general_remarks" rows="2"
+                          placeholder="e.g. Recommend CRA fraction tiles and 10 mins reading buffer. Will pair with peer study buddy for collaborative review..."
+                          style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.95rem;"></textarea>
+            </div>
+
+            <!-- Examiner Name -->
+            <div style="max-width: 320px;">
+                <label for="examiner_name" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                    Name of the Examiner
+                </label>
+                <input type="text" id="examiner_name" name="examiner_name" value="{{ session.get('user', {}).get('full_name', 'Mrs. Ananya Sharma') }}" required
+                       style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+            </div>
+        </div>
+
+        <div style="text-align: right; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-doorbell" style="padding: 0.85rem 2.5rem; font-size: 1.05rem;">
+                Save Front-Cover Marks & Diagnostic Remarks
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Dynamic Live Marks Calculator Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const markInputs = document.querySelectorAll(".q-mark-input");
+    const totalDisplay = document.getElementById("live-total-display");
+
+    function calculateTotal() {
+        let sum = 0.0;
+        markInputs.forEach(inp => {
+            const val = parseFloat(inp.value);
+            if (!isNaN(val)) {
+                sum += val;
+            }
+        });
+        totalDisplay.textContent = `${sum.toFixed(1)} / 50`;
+    }
+
+    markInputs.forEach(inp => {
+        inp.addEventListener("input", calculateTotal);
+    });
+
+    calculateTotal();
+});
+</script>
+{% endblock %}

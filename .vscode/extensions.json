@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "qwtel.sqlite-viewer",
+    "formulahendry.auto-rename-tag",
+    "ritwickdey.liveserver"
+  ]
+}

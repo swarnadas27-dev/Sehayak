@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. Run SEHAYAK Web App",
+      "type": "shell",
+      "command": "python app.py",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "2. Generate Synthetic Dataset",
+      "type": "shell",
+      "command": "python utils/data_generator.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "3. Train Risk Models",
+      "type": "shell",
+      "command": "python models/risk_model.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "4. Run All Unit Tests",
+      "type": "shell",
+      "command": "python -m unittest discover -s tests -p \"test_*.py\"",
+      "problemMatcher": []
+    },
+    {
+      "label": "5. Install Dependencies",
+      "type": "shell",
+      "command": "pip install -r requirements.txt",
+      "problemMatcher": []
+    }
+  ]
+}

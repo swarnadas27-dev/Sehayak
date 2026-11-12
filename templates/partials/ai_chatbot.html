@@ -1,0 +1,210 @@
+<!-- Shared Context-Aware AI Chatbot & Exercise Practice Handler -->
+<div class="card" id="{{ chatbot_anchor_id }}" style="border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 6px 0 #01463C; background: #FFFFFF; margin-top: 2rem;">
+    <div class="card-title" style="margin-bottom: 0.85rem;">
+        <div>
+            <span class="role-badge-tag" style="background: #9B74FF; color: #01463C; margin-bottom: 0.35rem;">24x7 AI Assistant</span>
+            <h3 style="font-size: 1.45rem; font-weight: 800; color: #01463C; margin: 0.2rem 0 0;">
+                {{ chatbot_title }}
+            </h3>
+        </div>
+        <span style="font-size: 0.82rem; font-weight: 700; color: #537D75;">
+            Tailored to {{ student.name if student else 'Aarav Sharma' }}
+        </span>
+    </div>
+
+    <p style="font-size: 0.94rem; color: #1F5F55; line-height: 1.55; margin-bottom: 1rem;">
+        {{ chatbot_subtitle }}
+    </p>
+
+    <!-- Suggested Prompt Chips -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1rem;" id="chatbot-chips-{{ chatbot_role }}">
+        {% for chip in chatbot_chips %}
+        <button type="button" class="btn btn-secondary chatbot-chip-btn"
+                data-question="{{ chip }}"
+                style="font-size: 0.8rem; padding: 0.38rem 0.85rem; background: #FDF7EF; border: 1.5px solid #01463C; border-radius: 9999px; color: #01463C; font-weight: 700;">
+            {{ chip }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Chat History Window -->
+    <div id="chatbot-messages-{{ chatbot_role }}"
+         aria-live="polite"
+         style="background: #FDF7EF; border: 2px solid #01463C; border-radius: 20px; padding: 1.1rem; min-height: 220px; max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1rem;">
+        <div style="background: #E8F7F6; border: 1.5px solid #01463C; border-radius: 16px; padding: 0.9rem 1.05rem; align-self: flex-start; max-width: 90%;">
+            <div style="font-size: 0.78rem; font-weight: 800; color: #01463C; text-transform: uppercase; margin-bottom: 0.25rem;">
+                {{ chatbot_title }}
+            </div>
+            <div style="font-size: 0.92rem; color: #01463C; line-height: 1.55;" id="chatbot-welcome-{{ chatbot_role }}">
+                {% if chatbot_role == 'parent' %}
+                Namaste! Ask me any question in plain words—about {{ student.name if student else 'your child' }}'s weak exam questions, what their learning support profile means, 10-minute home exercises, or how to talk to School Counselor Dr. Meera Deshmukh.
+                {% else %}
+                Hi! Ask me anything—like which Maths question needs practice, how to unlock Question 9 logic, a calm 10-minute study trick, or how to message Counselor Ma'am.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Bar -->
+    <form id="chatbot-form-{{ chatbot_role }}" style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+        <label for="chatbot-input-{{ chatbot_role }}" class="sr-only" style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Ask a question</label>
+        <input type="text" id="chatbot-input-{{ chatbot_role }}" required
+               placeholder="{% if chatbot_role == 'parent' %}Ask about child progress, LD support, home routines, or counselor...{% else %}Ask about any maths question, study technique, or counselor help...{% endif %}"
+               style="flex: 1; min-width: 240px; padding: 0.75rem 1.1rem; border-radius: 9999px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-family: inherit; font-size: 0.95rem; font-weight: 600;">
+        <button type="submit" class="btn btn-doorbell" style="padding: 0.7rem 1.65rem; border-radius: 9999px; font-size: 0.95rem;">
+            Ask AI
+        </button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const role = "{{ chatbot_role }}";
+    const form = document.getElementById("chatbot-form-" + role);
+    const input = document.getElementById("chatbot-input-" + role);
+    const messagesBox = document.getElementById("chatbot-messages-" + role);
+    const chipsBox = document.getElementById("chatbot-chips-" + role);
+
+    if (!form || !input || !messagesBox) return;
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text || "";
+        return div.innerHTML;
+    }
+
+    function appendMessage(senderType, text, highlights) {
+        const bubble = document.createElement("div");
+        const isUser = senderType === "user";
+        bubble.style.border = "1.5px solid #01463C";
+        bubble.style.borderRadius = "16px";
+        bubble.style.padding = "0.85rem 1.05rem";
+        bubble.style.maxWidth = "90%";
+        bubble.style.alignSelf = isUser ? "flex-end" : "flex-start";
+        bubble.style.background = isUser ? "#F8E7CD" : "#E8F7F6";
+
+        const header = document.createElement("div");
+        header.style.fontSize = "0.76rem";
+        header.style.fontWeight = "800";
+        header.style.color = "#01463C";
+        header.style.textTransform = "uppercase";
+        header.style.marginBottom = "0.25rem";
+        header.textContent = isUser ? "You" : "{{ chatbot_title }}";
+        bubble.appendChild(header);
+
+        const body = document.createElement("div");
+        body.style.fontSize = "0.92rem";
+        body.style.color = "#01463C";
+        body.style.lineHeight = "1.55";
+        body.style.whiteSpace = "pre-line";
+        body.textContent = text;
+        bubble.appendChild(body);
+
+        if (!isUser && Array.isArray(highlights) && highlights.length > 0) {
+            const tagsRow = document.createElement("div");
+            tagsRow.style.display = "flex";
+            tagsRow.style.flexWrap = "wrap";
+            tagsRow.style.gap = "0.35rem";
+            tagsRow.style.marginTop = "0.55rem";
+            highlights.forEach(h => {
+                const tag = document.createElement("span");
+                tag.className = "role-badge-tag";
+                tag.style.background = "#FFFFFF";
+                tag.style.color = "#01463C";
+                tag.style.fontSize = "0.72rem";
+                tag.textContent = h;
+                tagsRow.appendChild(tag);
+            });
+            bubble.appendChild(tagsRow);
+        }
+
+        if (!isUser && window.sehayakTTS) {
+            const speakBtn = document.createElement("button");
+            speakBtn.type = "button";
+            speakBtn.className = "btn btn-tts";
+            speakBtn.style.fontSize = "0.75rem";
+            speakBtn.style.padding = "0.25rem 0.65rem";
+            speakBtn.style.marginTop = "0.5rem";
+            speakBtn.textContent = "Read Aloud";
+            speakBtn.addEventListener("click", function() {
+                window.sehayakTTS.speak(text, "{{ lang|default('en') }}");
+            });
+            bubble.appendChild(speakBtn);
+        }
+
+        messagesBox.appendChild(bubble);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+
+    async function sendChatQuestion(questionText) {
+        const cleaned = (questionText || "").trim();
+        if (!cleaned) return;
+        appendMessage("user", cleaned, []);
+        input.value = "";
+
+        try {
+            const resp = await fetch("/api/chatbot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: cleaned, role: role })
+            });
+            const data = await resp.json();
+            if (data && data.status === "success") {
+                appendMessage("ai", data.answer, data.highlights || []);
+                if (chipsBox && Array.isArray(data.suggested_questions)) {
+                    chipsBox.innerHTML = "";
+                    data.suggested_questions.forEach(q => {
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "btn btn-secondary chatbot-chip-btn";
+                        btn.style.cssText = "font-size: 0.8rem; padding: 0.38rem 0.85rem; background: #FDF7EF; border: 1.5px solid #01463C; border-radius: 9999px; color: #01463C; font-weight: 700;";
+                        btn.textContent = q;
+                        btn.addEventListener("click", () => sendChatQuestion(q));
+                        chipsBox.appendChild(btn);
+                    });
+                }
+            } else {
+                appendMessage("ai", "Sorry, I could not load the answer right now. Please try again.", []);
+            }
+        } catch (err) {
+            appendMessage("ai", "Connection hiccup while answering. Please check that the portal server is running.", []);
+        }
+    }
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        sendChatQuestion(input.value);
+    });
+
+    if (chipsBox) {
+        chipsBox.querySelectorAll(".chatbot-chip-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                sendChatQuestion(btn.getAttribute("data-question"));
+            });
+        });
+    }
+
+    // Wire Practice Tracker buttons across Study Techniques & Exercises cards
+    document.querySelectorAll(".practice-log-btn").forEach(btn => {
+        btn.addEventListener("click", async function() {
+            const exId = btn.getAttribute("data-ex-id");
+            const countEl = document.getElementById("practice-count-" + exId);
+            btn.disabled = true;
+            try {
+                const res = await fetch("/exercise/" + exId + "/practice", {
+                    method: "POST",
+                    headers: { "X-Requested-With": "XMLHttpRequest", "Content-Type": "application/json" }
+                });
+                const payload = await res.json();
+                if (payload && payload.status === "success") {
+                    if (countEl) countEl.textContent = payload.practice_count + "x practiced";
+                    btn.textContent = "Practiced Today (Saved!)";
+                    if (window.playPleasantChime) window.playPleasantChime();
+                }
+            } catch (err) {
+                btn.disabled = false;
+            }
+        });
+    });
+});
+</script>

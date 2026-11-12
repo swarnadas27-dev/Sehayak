@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 2rem auto;">
+    <div class="card" style="border-radius: 32px; border: 3px solid #01463C; box-shadow: 0 8px 0 #01463C, 0 30px 60px -10px rgba(1,70,60,0.15); padding: 2.75rem 2.5rem; background: #FFFFFF;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div class="brand-logo-mark" style="width: 54px; height: 54px; font-size: 1.5rem; margin: 0 auto 1rem;" aria-hidden="true">S</div>
+            <h2 style="font-size: 2.1rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem; letter-spacing: -0.02em;">
+                SEHAYAK Access Portal
+            </h2>
+            <p style="color: #1F5F55; font-size: 0.98rem; font-weight: 600;">
+                Ministry of Education #PSB152 &bull; Role-Based Institutional Access
+            </p>
+        </div>
+
+        <!-- 5 Role Tabs (Pill Switcher) -->
+        <div style="display: flex; gap: 0.45rem; margin-bottom: 2rem; background: #F8E7CD; padding: 0.45rem; border-radius: 9999px; border: 2px solid #01463C; flex-wrap: wrap; box-shadow: 0 3px 0 #01463C;">
+            <button type="button" id="tab-btn-teacher" class="btn btn-secondary active" onclick="switchLoginTab('teacher')" style="flex: 1; font-size: 0.88rem; padding: 0.6rem; border-radius: 9999px;">
+                Teacher
+            </button>
+            <button type="button" id="tab-btn-student" class="btn btn-secondary" onclick="switchLoginTab('student')" style="flex: 1; font-size: 0.88rem; padding: 0.6rem; border-radius: 9999px;">
+                Student
+            </button>
+            <button type="button" id="tab-btn-parent" class="btn btn-secondary" onclick="switchLoginTab('parent')" style="flex: 1; font-size: 0.88rem; padding: 0.6rem; border-radius: 9999px;">
+                Parent
+            </button>
+            <button type="button" id="tab-btn-counselor" class="btn btn-secondary" onclick="switchLoginTab('counselor')" style="flex: 1; font-size: 0.88rem; padding: 0.6rem; border-radius: 9999px;">
+                Counselor
+            </button>
+            <button type="button" id="tab-btn-principal" class="btn btn-secondary" onclick="switchLoginTab('principal')" style="flex: 1; font-size: 0.88rem; padding: 0.6rem; border-radius: 9999px;">
+                Principal
+            </button>
+        </div>
+
+        <!-- Unified Login Form -->
+        <form method="POST" action="{{ url_for('login') }}" id="login-form">
+            <div style="margin-bottom: 1.35rem;">
+                <label for="username" style="display: block; font-weight: 800; margin-bottom: 0.45rem; font-size: 0.92rem; color: #01463C;" id="username-label">
+                    Username or Identifier
+                </label>
+                <input type="text" id="username" name="username" required
+                       style="width: 100%; padding: 0.85rem 1.25rem; border-radius: 16px; border: 2.5px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 1rem; font-family: inherit; font-weight: 600; box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);">
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label for="password" style="display: block; font-weight: 800; margin-bottom: 0.45rem; font-size: 0.92rem; color: #01463C;">
+                    Password / PIN
+                </label>
+                <input type="password" id="password" name="password" required
+                       style="width: 100%; padding: 0.85rem 1.25rem; border-radius: 16px; border: 2.5px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 1rem; font-family: inherit; font-weight: 600; box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);">
+            </div>
+
+            <!-- Tactile Doorbell Sign-In Action Button -->
+            <button type="submit" id="submit-btn" class="btn btn-doorbell" style="width: 100%; padding: 0.95rem; font-size: 1.1rem; letter-spacing: -0.01em; border-radius: 9999px;">
+                <span id="submit-btn-text">
+                    {% if default_role == 'parent' %}
+                        Sign In as Parent (View Child & Chat)
+                    {% elif default_role == 'student' %}
+                        Sign In as Student (Take CBSE Tests)
+                    {% elif default_role == 'counselor' %}
+                        Sign In as School Counselor
+                    {% elif default_role == 'principal' %}
+                        Sign In as Principal
+                    {% else %}
+                        Sign In as Teacher
+                    {% endif %}
+                </span>
+            </button>
+        </form>
+
+        <!-- Comprehensive 1-Click Demo Accounts -->
+        <div style="margin-top: 2.25rem; padding-top: 1.75rem; border-top: 2.5px dashed #01463C;">
+            <div style="text-align: center; font-size: 0.85rem; font-weight: 800; color: #01463C; margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.06em;">
+                1-Click Quick Demo Sign-In Across All 5 Roles:
+            </div>
+
+            <!-- Principal & School Counselor -->
+            <div style="margin-bottom: 1.15rem;">
+                <span style="font-size: 0.8rem; font-weight: 800; color: #01463C; text-transform: uppercase; letter-spacing: 0.05em;">Leadership & School Counselor:</span>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem;">
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('principal', 'principal123')" style="font-size: 0.84rem; padding: 0.5rem 1.05rem; background: #F8E7CD; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Principal Dr. Rajesh Gupta (All 300 Students)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('counselor1', 'counselor123')" style="font-size: 0.84rem; padding: 0.5rem 1.05rem; background: #E8F7F6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Counselor: Dr. Meera Deshmukh (LD &amp; Support)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3 Teachers (100 students each) -->
+            <div style="margin-bottom: 1.15rem;">
+                <span style="font-size: 0.8rem; font-weight: 800; color: #01463C; text-transform: uppercase; letter-spacing: 0.05em;">3 Teachers (100 Students Each):</span>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem;">
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('teacher1', 'teacher123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #E8F7F6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Teacher 1: Mrs. Sharma (Grade 7)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('teacher2', 'teacher123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #E8F7F6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Teacher 2: Mr. Iyer (Grade 8)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('teacher3', 'teacher123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #E8F7F6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Teacher 3: Ms. Verma (Grade 9)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3 Students -->
+            <div style="margin-bottom: 1.15rem;">
+                <span style="font-size: 0.8rem; font-weight: 800; color: #01463C; text-transform: uppercase; letter-spacing: 0.05em;">3 Students (CBSE 30-Mark Tests):</span>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem;">
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('student1', 'student123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #F3EEFF; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Student 1: Aarav Sharma (Cl 7)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('student2', 'student123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #F3EEFF; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Student 2: Diya Patel (Cl 8)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('student3', 'student123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #F3EEFF; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Student 3: Md. Faizan (Cl 9)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3 Parents -->
+            <div>
+                <span style="font-size: 0.8rem; font-weight: 800; color: #01463C; text-transform: uppercase; letter-spacing: 0.05em;">3 Parents (Progress & Teacher Chat):</span>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.4rem;">
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('parent1', 'parent123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #FFF7E6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Parent 1: Mr. Sharma (Aarav)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('parent2', 'parent123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #FFF7E6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Parent 2: Mrs. Patel (Diya)
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="fillUser('parent3', 'parent123')" style="font-size: 0.84rem; padding: 0.5rem 1rem; background: #FFF7E6; border: 2px solid #01463C; color: #01463C; box-shadow: 0 3px 0 #01463C;">
+                        Parent 3: Mr. Faizan (Faizan)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchLoginTab(role) {
+    ['teacher', 'student', 'parent', 'counselor', 'principal'].forEach(r => {
+        const btn = document.getElementById(`tab-btn-${r}`);
+        if (btn) btn.classList.toggle('active', r === role);
+    });
+
+    const submitBtn = document.getElementById('submit-btn');
+    const submitBtnText = document.getElementById('submit-btn-text');
+    if (role === 'principal') {
+        if (submitBtnText) submitBtnText.textContent = 'Sign In as Principal';
+        submitBtn.style.background = '#4338CA';
+        submitBtn.style.boxShadow = '0 4px 0 #312E81';
+    } else if (role === 'counselor') {
+        if (submitBtnText) submitBtnText.textContent = 'Sign In as School Counselor';
+        submitBtn.style.background = '#1EACB0';
+        submitBtn.style.boxShadow = '0 4px 0 #01463C';
+    } else if (role === 'teacher') {
+        if (submitBtnText) submitBtnText.textContent = 'Sign In as Teacher';
+        submitBtn.style.background = '#2563EB';
+        submitBtn.style.boxShadow = '0 4px 0 #1E40AF';
+    } else if (role === 'student') {
+        if (submitBtnText) submitBtnText.textContent = 'Sign In as Student (Take CBSE Tests)';
+        submitBtn.style.background = '#059669';
+        submitBtn.style.boxShadow = '0 4px 0 #065F46';
+    } else {
+        if (submitBtnText) submitBtnText.textContent = 'Sign In as Parent (View Child & Chat)';
+        submitBtn.style.background = '#D97706';
+        submitBtn.style.boxShadow = '0 4px 0 #92400E';
+    }
+}
+
+function fillUser(u, p) {
+    document.getElementById('username').value = u;
+    document.getElementById('password').value = p;
+    if (u.startsWith('teacher')) switchLoginTab('teacher');
+    else if (u.startsWith('student')) switchLoginTab('student');
+    else if (u.startsWith('parent')) switchLoginTab('parent');
+    else if (u.startsWith('counselor')) switchLoginTab('counselor');
+    else if (u === 'principal') switchLoginTab('principal');
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialRole = urlParams.get('role') || '{{ default_role|default("teacher") }}';
+    if (initialRole) {
+        switchLoginTab(initialRole);
+        if (initialRole === 'teacher') fillUser('teacher1', 'teacher123');
+        else if (initialRole === 'student') fillUser('student1', 'student123');
+        else if (initialRole === 'parent') fillUser('parent1', 'parent123');
+        else if (initialRole === 'counselor') fillUser('counselor1', 'counselor123');
+        else if (initialRole === 'principal') fillUser('principal', 'principal123');
+    }
+});
+</script>
+{% endblock %}

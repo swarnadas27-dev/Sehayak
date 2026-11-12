@@ -1,0 +1,954 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1050px; margin: 1rem auto;">
+    <!-- Student Header & Warm Greeting -->
+    <div class="card card-mint" style="border: 2.5px solid #01463C; border-radius: 28px; padding: 2.25rem 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 0 #01463C;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+            <div>
+                <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C; margin-bottom: 0.5rem;">
+                    Student Practice & Growth Portal
+                </span>
+                <h2 style="font-size: 1.95rem; font-weight: 800; margin-top: 0.5rem; margin-bottom: 0.4rem; color: #01463C; letter-spacing: -0.02em;">
+                    {{ t('student_portal_welcome') }}
+                </h2>
+                <p style="font-size: 1rem; color: #1F5F55; max-width: 680px; line-height: 1.6;">
+                    Welcome to your personal learning space. Practice targeted questions where you lost marks on your exam papers, explore dyslexia-friendly thinking logic, or take full <strong>30-Marks CBSE Assessments</strong>. No timers, zero pressure.
+                </p>
+            </div>
+
+            <div style="text-align: center; background: #FFFFFF; padding: 1.25rem 1.85rem; border-radius: 22px; border: 2.5px solid #01463C; box-shadow: 0 4px 0 #01463C;">
+                <div style="font-size: 1rem; font-weight: 800; color: #01463C;">Growth Explorer</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">Visual & Multisensory Learning</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compact Quick-Switch Workspace Navigation (No Long Scrolling!) -->
+    <div id="student-workspace-tabs"
+         style="display: flex; gap: 0.55rem; flex-wrap: wrap; align-items: center; justify-content: space-between; background: #F8E7CD; border: 2.5px solid #01463C; border-radius: 22px; padding: 0.7rem 0.9rem; margin-bottom: 1.75rem; box-shadow: 0 4px 0 #01463C; position: sticky; top: 0.65rem; z-index: 40;">
+        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary stu-tab-btn active" data-tab="practice"
+                    style="font-size: 0.88rem; padding: 0.5rem 1.05rem; border-radius: 9999px;">
+                Practice Sessions &amp; Study Tricks
+            </button>
+            <button type="button" class="btn btn-secondary stu-tab-btn" data-tab="clinic"
+                    style="font-size: 0.88rem; padding: 0.5rem 1.05rem; border-radius: 9999px;">
+                Exam Paper Clinic &amp; AI Logic
+            </button>
+            <button type="button" class="btn btn-secondary stu-tab-btn" data-tab="tests"
+                    style="font-size: 0.88rem; padding: 0.5rem 1.05rem; border-radius: 9999px;">
+                30-Marks CBSE Tests
+            </button>
+            <button type="button" class="btn btn-secondary stu-tab-btn" data-tab="counselor"
+                    style="font-size: 0.88rem; padding: 0.5rem 1.05rem; border-radius: 9999px;">
+                Counselor &amp; AI Study Buddy
+            </button>
+        </div>
+        <button type="button" class="btn btn-secondary stu-tab-btn" data-tab="all"
+                style="font-size: 0.8rem; padding: 0.4rem 0.85rem; border-radius: 9999px; background: #FFFFFF;">
+            Show All
+        </button>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 1: AI DIAGNOSTIC TUTOR - HOW TO PRACTICE & IMPROVE YOUR PAPER -->
+    <!-- =================================================================== -->
+    <div class="stu-tab-panel" data-panel="clinic">
+    {% if paper_performance %}
+    <div class="card card-sand" style="border: 2.5px solid #01463C; border-radius: 28px; padding: 2.25rem; margin-bottom: 2.25rem; box-shadow: 0 4px 0 #01463C;" id="ai-paper-clinic">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+                <span class="role-badge-tag" style="background: #9B74FF; color: #01463C; border: 1.5px solid #01463C; margin-bottom: 0.45rem;">
+                    AI Learning Logic & Paper Clinic
+                </span>
+                <h3 style="font-size: 1.65rem; font-weight: 800; color: #01463C; margin-top: 0.35rem; letter-spacing: -0.02em;">
+                    How to Improve on Your {{ paper_performance.coaching.subject }} Paper
+                </h3>
+                <p style="font-size: 0.95rem; color: #1F5F55; max-width: 720px; line-height: 1.55;">
+                    Diagnostic breakdown of <strong>{{ paper_performance.coaching.paper_title }}</strong>. The AI has identified the specific questions where marks were dropped and mapped out visual, step-by-step thinking logic to master each concept.
+                </p>
+            </div>
+
+            <!-- Recovery Target Badge -->
+            <div style="background: #FFFFFF; border: 2.5px solid #01463C; border-radius: 20px; padding: 0.85rem 1.35rem; text-align: center; box-shadow: 0 3px 0 #01463C;">
+                <span style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block;">
+                    Target Next Score
+                </span>
+                <div style="font-size: 1.6rem; font-weight: 800; color: #059669; margin: 0.15rem 0;">
+                    {{ paper_performance.coaching.target_next_score }} / {{ paper_performance.coaching.total_max }}
+                </div>
+                <span class="badge-support badge-guided" style="font-size: 0.75rem; padding: 0.2rem 0.65rem;">
+                    Gain +{{ paper_performance.coaching.total_recoverable_marks }} Marks
+                </span>
+            </div>
+        </div>
+
+        <!-- Score Progress & Diagnostics Hero Tile -->
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 20px; padding: 1.35rem; margin-bottom: 1.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.75rem;">
+                <div>
+                    <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Current Exam Score</span>
+                    <div style="font-size: 1.45rem; font-weight: 800; color: #01463C;">
+                        {{ paper_performance.coaching.total_obtained }} / {{ paper_performance.coaching.total_max }}
+                        <span style="font-size: 1rem; font-weight: 700; color: var(--text-secondary);">({{ paper_performance.coaching.percentage }}%)</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+                    <div style="background: #ECFDF5; border: 1.5px solid #059669; padding: 0.45rem 0.85rem; border-radius: 12px; font-size: 0.85rem; font-weight: 800; color: #065F46;">
+                        {{ paper_performance.strong_questions|length }} Questions Mastered
+                    </div>
+                    <div style="background: #FEF2F2; border: 1.5px solid #DC2626; padding: 0.45rem 0.85rem; border-radius: 12px; font-size: 0.85rem; font-weight: 800; color: #991B1B;">
+                        {{ paper_performance.weak_questions|length }} Practice Opportunities
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar with Target Marker -->
+            <div style="background: var(--bg-surface-alt); height: 16px; border-radius: 9999px; overflow: hidden; border: 2px solid #01463C; position: relative;">
+                <div style="background: linear-gradient(90deg, #1EACB0 0%, #9B74FF 100%); height: 100%; width: {{ paper_performance.coaching.percentage }}%; border-radius: 9999px; transition: width 0.4s ease;"></div>
+            </div>
+
+            {% if paper_performance.coaching.teacher_notes %}
+            <div style="margin-top: 1rem; padding: 0.85rem 1.15rem; background: var(--bg-surface-alt); border-radius: 14px; border: 1.5px solid var(--border-color); font-size: 0.9rem; color: #01463C; line-height: 1.5;">
+                <strong style="color: #991B1B;">Teacher Observation:</strong> {{ paper_performance.coaching.teacher_notes }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- WEAK QUESTIONS: SPECIFIC LOGIC BREAKDOWN & INTERACTIVE PRACTICE -->
+        <!-- =================================================================== -->
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;">
+                <div>
+                    <h4 style="font-size: 1.25rem; font-weight: 800; color: #01463C; letter-spacing: -0.01em;">
+                        Questions Where Marks Were Dropped (With Visual Thinking Logic)
+                    </h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Apply the suggested dyslexia-friendly mental models below, then practice the mirror question to cement your understanding!
+                    </p>
+                </div>
+                <span class="role-badge-tag" style="background: #FFFFFF; color: #01463C; border: 1.5px solid #01463C;">
+                    {{ paper_performance.weak_questions|length }} Questions to Practice
+                </span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+                {% for w in paper_performance.weak_questions %}
+                <div class="card" style="border: 2.5px solid #01463C; border-radius: 24px; padding: 1.75rem; background: #FFFFFF; box-shadow: 0 4px 0 #01463C; margin-bottom: 0;">
+                    <!-- Question Header & Marks Recovery Badge -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.85rem;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C;">
+                                    Question {{ w.q }}
+                                </span>
+                                <span class="role-badge-tag" style="background: #FEF2F2; color: #991B1B; border: 1.5px solid #DC2626;">
+                                    Scored: {{ w.marks_obtained }} / {{ w.max_marks }}M
+                                </span>
+                                <span class="badge-support badge-guided" style="font-size: 0.78rem; padding: 0.25rem 0.65rem;">
+                                    +{{ w.lost_marks }}M Recovery Opportunity
+                                </span>
+                            </div>
+                            <h4 style="font-size: 1.3rem; font-weight: 800; color: #01463C; margin-top: 0.45rem;">
+                                {{ w.logic.concept }}
+                            </h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                                {{ w.logic.question_summary }}
+                            </p>
+                        </div>
+
+                        <button class="btn btn-tts tts-btn" data-target-id="logic-step-{{ w.q }}" data-lang="{{ lang }}" style="padding: 0.35rem 0.85rem; font-size: 0.82rem;">
+                            Listen to Logic
+                        </button>
+                    </div>
+
+                    <!-- Dyslexia / Visual Challenge Explanation -->
+                    <div style="padding: 0.85rem 1.15rem; background: #FFF7E6; border: 1.5px solid #F0AF00; border-radius: 14px; margin-bottom: 1.25rem; font-size: 0.9rem; color: #01463C; line-height: 1.5;">
+                        <strong style="color: #92400E;">Why this question feels tricky:</strong> {{ w.logic.dyslexia_barrier }}
+                    </div>
+
+                    <!-- THE THINKING LOGIC (HOW TO APPLY LOGIC) -->
+                    <div id="logic-step-{{ w.q }}" style="background: #E8F7F6; border: 2px solid #01463C; border-radius: 18px; padding: 1.35rem; margin-bottom: 1.35rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <span class="role-badge-tag" style="background: #1EACB0; color: #01463C; border: 1.5px solid #01463C; font-size: 0.82rem;">
+                                Apply This Logic: {{ w.logic.logic_name }}
+                            </span>
+                        </div>
+
+                        <p style="font-size: 0.95rem; color: #01463C; margin-bottom: 1rem; font-weight: 700; line-height: 1.5;">
+                            Mental Model: <em>{{ w.logic.visual_metaphor }}</em>
+                        </p>
+
+                        <!-- Step-by-Step Blueprint Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem;">
+                            {% for st in w.logic.steps %}
+                            <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.85rem; box-shadow: 0 2px 0 #01463C;">
+                                <div style="font-size: 0.75rem; font-weight: 800; color: #9B74FF; text-transform: uppercase;">
+                                    Step {{ st.step }}
+                                </div>
+                                <div style="font-weight: 800; font-size: 0.92rem; color: #01463C; margin: 0.2rem 0 0.35rem;">
+                                    {{ st.title }}
+                                </div>
+                                <div style="font-size: 0.85rem; color: #1F5F55; line-height: 1.45;">
+                                    {{ st.detail }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- TARGETED MIRROR PRACTICE DRILL -->
+                    <div class="card practice-card"
+                         id="drill-card-{{ w.q }}"
+                         data-correct-index="{{ w.logic.drill.correct_index }}"
+                         data-encouraging-msg="{{ w.logic.drill.explanation }}"
+                         data-tryagain-msg="Not quite yet. Re-read Step 1 and give it another try—you've got this!"
+                         style="padding: 1.35rem; background: var(--bg-surface-alt); border: 2px solid #01463C; border-radius: 18px; margin-bottom: 0; box-shadow: 0 3px 0 #01463C;">
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <span class="role-badge-tag" style="background: #9B74FF; color: #01463C; border: 1.5px solid #01463C;">
+                                Practice This Logic (Instant Check)
+                            </span>
+                            <span style="font-size: 0.82rem; color: var(--text-muted);">Self-Paced &bull; No Timers</span>
+                        </div>
+
+                        <div id="q-drill-prompt-{{ w.q }}" style="font-size: 1.05rem; font-weight: 800; color: #01463C; line-height: 1.5; margin-bottom: 1rem;">
+                            {{ w.logic.drill.prompt }}
+                        </div>
+
+                        <!-- Options Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.65rem; margin-bottom: 0.85rem;">
+                            {% for opt in w.logic.drill.options %}
+                            <button type="button" class="practice-option btn btn-secondary" style="padding: 0.75rem 1rem; font-size: 0.92rem; text-align: left; justify-content: flex-start; border-radius: 14px;">
+                                <span style="font-weight: 800; margin-right: 0.5rem; color: #9B74FF;">{{ ['A', 'B', 'C', 'D'][loop.index0] }}.</span>
+                                <span>{{ opt }}</span>
+                            </button>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Feedback Box -->
+                        <div class="practice-feedback" style="display: none; padding: 1rem; border-radius: 14px; margin-top: 0.75rem; border: 2px solid #01463C;" role="alert" aria-live="polite"></div>
+
+                        <!-- Visual Hint -->
+                        <div style="margin-top: 0.85rem; border-top: 1px dashed var(--border-color); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                            <button type="button" class="btn btn-secondary hint-toggle-btn" style="font-size: 0.82rem; padding: 0.35rem 0.75rem;">
+                                Need a Visual Hint?
+                            </button>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">Take all the time you need.</span>
+                        </div>
+
+                        <div class="practice-hint" style="display: none; background: #FFF7E6; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.85rem; margin-top: 0.65rem; font-size: 0.88rem; color: #01463C;">
+                            <strong>Helpful Hint:</strong> {{ w.logic.drill.hint }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- STRENGTHS CELEBRATION (What the student already mastered) -->
+        <!-- =================================================================== -->
+        {% if paper_performance.strong_questions %}
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 20px; padding: 1.35rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.65rem;">
+                <span class="status-dot status-ontrack-dot"></span>
+                <h4 style="font-size: 1.15rem; font-weight: 800; color: #065F46; margin: 0;">
+                    Your Strengths: Questions You Already Mastered
+                </h4>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
+                You earned full marks on these questions! Your core intuition in these areas is strong:
+            </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                {% for sq in paper_performance.strong_questions %}
+                <div style="background: #ECFDF5; border: 1.5px solid #059669; padding: 0.4rem 0.75rem; border-radius: 12px; font-size: 0.85rem; color: #065F46; font-weight: 700;">
+                    Q{{ sq.q }}: {{ sq.logic.concept }} ({{ sq.marks_obtained }}/{{ sq.max_marks }}M)
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- =================================================================== -->
+        <!-- 4 AI DYSLEXIA EXAM HACKS (HOW TO IMPROVE ON PAPERS) -->
+        <!-- =================================================================== -->
+        <div>
+            <h4 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 1rem; letter-spacing: -0.01em;">
+                4 AI Dyslexia Hacks to Improve Your Next Paper
+            </h4>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                {% for h in paper_performance.coaching.exam_hacks %}
+                <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.25rem; box-shadow: 0 3px 0 #01463C;">
+                    <span class="role-badge-tag" style="background: #F8E7CD; color: #01463C; border: 1.5px solid #01463C; margin-bottom: 0.45rem;">
+                        {{ h.tag }}
+                    </span>
+                    <h5 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin: 0.35rem 0 0.45rem;">
+                        {{ h.title }}
+                    </h5>
+                    <p style="font-size: 0.86rem; color: #1F5F55; line-height: 1.5; margin: 0;">
+                        {{ h.summary }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- INTERACTIVE AI QUESTION COACH: ASK FOR ANY QUESTION (Q1 to Q15) -->
+        <!-- =================================================================== -->
+        <div style="margin-top: 2rem; background: #FFFFFF; border: 2px solid #01463C; border-radius: 20px; padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+                <div>
+                    <h4 style="font-size: 1.15rem; font-weight: 800; color: #01463C; margin: 0;">
+                        Explore AI Thinking Logic for Any Question (Q1 to Q15)
+                    </h4>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                        Pick any question number to see its Concrete-Representational visual model and practice drill.
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 0.65rem; align-items: center;">
+                    <select id="ai-q-select" style="padding: 0.45rem 0.85rem; border-radius: 12px; border: 2px solid #01463C; font-weight: 700; color: #01463C;">
+                        {% for q_num in range(1, 16) %}
+                        <option value="{{ q_num }}" {% if q_num == 3 %}selected{% endif %}>Question {{ q_num }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" id="load-ai-logic-btn" class="btn btn-doorbell" style="padding: 0.45rem 1.15rem; font-size: 0.88rem;">
+                        Load AI Logic &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Result Placeholder -->
+            <div id="ai-dynamic-result" style="display: none; margin-top: 1.25rem;"></div>
+        </div>
+    </div>
+    {% endif %}
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 2: CBSE 30-MARKS ASSESSMENT LAUNCH PAD -->
+    <!-- =================================================================== -->
+    <div class="stu-tab-panel" data-panel="tests">
+    <div class="card card-sand" style="border: 2.5px solid #01463C; border-radius: 28px; padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: 0 4px 0 #01463C;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.35rem;">
+            <div>
+                <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C; margin-bottom: 0.45rem;">
+                    Official Curriculum Assessment
+                </span>
+                <h3 style="font-size: 1.5rem; font-weight: 800; color: #01463C; margin-top: 0.35rem; letter-spacing: -0.01em;">
+                    Take a 30-Marks CBSE Subject Test
+                </h3>
+                <p style="font-size: 0.95rem; color: #1F5F55;">
+                    15 Objective MCQs (15M) + 5 Conceptual Typed Answers (15M) &bull; Audio read-aloud & voice dictation enabled
+                </p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+            <a href="{{ url_for('take_test_view', subject='mathematics') }}" class="btn btn-teacher" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
+                Mathematics (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='science') }}" class="btn btn-student" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
+                Science (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='social science') }}" class="btn btn-principal" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
+                Social Science (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='english') }}" class="btn btn-parent" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
+                English (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='hindi') }}" class="btn btn-doorbell" style="padding: 0.85rem 1rem; font-size: 0.95rem;">
+                हिन्दी (30M)
+            </a>
+        </div>
+    </div>
+
+    <!-- Past Test Attempts if any -->
+    {% if test_attempts %}
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+        <div class="card-title">
+            <span>My Completed 30-Marks Assessment Scorecards</span>
+        </div>
+        <div class="table-responsive" style="border: 2px solid #01463C; border-radius: 20px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>MCQs</th>
+                        <th>Written</th>
+                        <th>Badge Earned</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in test_attempts %}
+                    <tr>
+                        <td><strong>{{ a.subject }}</strong></td>
+                        <td><strong style="color: #01463C; font-size: 1.15rem;">{{ a.total_score }} / 30</strong> ({{ a.percentage }}%)</td>
+                        <td>{{ a.mcq_score }}/15</td>
+                        <td>{{ a.written_score }}/15</td>
+                        <td><span class="badge-support badge-ontrack">{{ a.badge }}</span></td>
+                        <td style="font-size: 0.82rem; color: var(--text-muted);">{{ a.created_at[:16] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- SECTION 3: BITE-SIZED TOPICAL PRACTICE DRILLS (FOCUSED CARD DECK)   -->
+    <!-- =================================================================== -->
+    <div class="stu-tab-panel" data-panel="practice">
+    <div class="card" id="quick-practice" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 1.75rem;">
+        <div class="card-title">
+            <div>
+                <span class="role-badge-tag" style="background: #9B74FF; color: #01463C; margin-bottom: 0.3rem;">Interactive Practice Session</span>
+                <h3 style="font-size: 1.5rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">Bite-Sized Quick Practice Drills</h3>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="#study-techniques" class="btn btn-secondary" style="font-size: 0.82rem; padding: 0.38rem 0.85rem;">
+                    Jump to 10-Min Study Tricks &darr;
+                </a>
+                <button type="button" id="toggle-all-drills-btn" class="btn btn-secondary" style="font-size: 0.82rem; padding: 0.38rem 0.85rem;">
+                    Expand All ({{ questions|length }})
+                </button>
+            </div>
+        </div>
+
+        <!-- Subject Filter Tabs -->
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+            <a href="{{ url_for('student_portal', subject='all', tab='practice') }}"
+               class="btn btn-secondary {% if current_subject == 'all' or not current_subject %}active{% endif %}"
+               style="font-size: 0.86rem; padding: 0.42rem 1.05rem;">
+                All Topics
+            </a>
+            <a href="{{ url_for('student_portal', subject='mathematics', tab='practice') }}"
+               class="btn btn-secondary {% if current_subject == 'mathematics' %}active{% endif %}"
+               style="font-size: 0.86rem; padding: 0.42rem 1.05rem;">
+                Mathematics
+            </a>
+            <a href="{{ url_for('student_portal', subject='science', tab='practice') }}"
+               class="btn btn-secondary {% if current_subject == 'science' %}active{% endif %}"
+               style="font-size: 0.86rem; padding: 0.42rem 1.05rem;">
+                Science
+            </a>
+            <a href="{{ url_for('student_portal', subject='english', tab='practice') }}"
+               class="btn btn-secondary {% if current_subject == 'english' %}active{% endif %}"
+               style="font-size: 0.86rem; padding: 0.42rem 1.05rem;">
+                English
+            </a>
+            <a href="{{ url_for('student_portal', subject='hindi', tab='practice') }}"
+               class="btn btn-secondary {% if current_subject == 'hindi' %}active{% endif %}"
+               style="font-size: 0.86rem; padding: 0.42rem 1.05rem;">
+                हिन्दी
+            </a>
+            <a href="{{ url_for('student_portal', subject='social science', tab='practice') }}"
+               class="btn btn-secondary {% if current_subject == 'social science' %}active{% endif %}"
+               style="font-size: 0.86rem; padding: 0.42rem 1.05rem;">
+                Social Science
+            </a>
+        </div>
+
+        <!-- Compact 1-Card Deck Stepper (Zero Scrolling Needed!) -->
+        {% if questions %}
+        <div id="drill-deck-nav" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem; background: #FDF7EF; border: 2px solid #01463C; border-radius: 16px; padding: 0.65rem 0.9rem; margin-bottom: 1.15rem;">
+            <button type="button" id="drill-prev-btn" class="btn btn-secondary" style="font-size: 0.84rem; padding: 0.4rem 0.9rem;">
+                &larr; Previous
+            </button>
+            <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; justify-content: center;">
+                <span id="drill-counter-label" style="font-size: 0.84rem; font-weight: 800; color: #01463C; margin-right: 0.35rem;">
+                    Question 1 of {{ questions|length }}
+                </span>
+                {% for q in questions %}
+                <button type="button" class="drill-step-pill btn btn-secondary {% if loop.first %}active{% endif %}"
+                        data-drill-idx="{{ loop.index0 }}"
+                        style="font-size: 0.78rem; padding: 0.28rem 0.6rem; min-width: 30px; border-radius: 9999px;">
+                    {{ loop.index }}
+                </button>
+                {% endfor %}
+            </div>
+            <button type="button" id="drill-next-btn" class="btn btn-doorbell" style="font-size: 0.84rem; padding: 0.4rem 0.95rem;">
+                Next Question &rarr;
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Practice Cards Grid -->
+        <div id="practice-cards-container" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% for q in questions %}
+            <div class="card practice-card quick-drill-item"
+                 id="card-{{ q.id }}"
+                 data-correct-index="{{ q.correct_index }}"
+                 data-encouraging-msg="{{ q.encouraging_feedback_hi if lang == 'hi' else q.encouraging_feedback_en }}"
+                 data-tryagain-msg="{{ t('try_again_message') }}"
+                 style="padding: 1.75rem; background: var(--bg-surface-alt); border: 2px solid #01463C; border-radius: 22px; box-shadow: 0 3px 0 #01463C; margin-bottom: 0;">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <span class="role-badge-tag" style="background: #FFFFFF; color: #01463C; border: 1.5px solid #01463C; margin-bottom: 0.4rem;">
+                            {{ q.subject }} &bull; {{ q.topic }}
+                        </span>
+                        <h3 id="q-text-{{ q.id }}" style="font-size: 1.25rem; font-weight: 800; margin-top: 0.35rem; color: #01463C; line-height: 1.5;">
+                            {{ q.question_hi if lang == 'hi' else q.question_en }}
+                        </h3>
+                    </div>
+
+                    <button class="btn btn-tts tts-btn" data-target-id="q-text-{{ q.id }}" data-lang="{{ lang }}" aria-label="Listen to this question">
+                        {{ t('tts_button') }}
+                    </button>
+                </div>
+
+                <!-- Options -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin: 1.35rem 0;">
+                    {% set opts = q.options_hi if lang == 'hi' else q.options_en %}
+                    {% for opt in opts %}
+                    <button type="button" class="practice-option btn btn-secondary" style="padding: 0.9rem 1.25rem; font-size: 0.95rem; text-align: left; justify-content: flex-start; border-radius: 16px;">
+                        <span style="font-weight: 800; margin-right: 0.6rem; color: #9B74FF;">{{ ['A', 'B', 'C', 'D'][loop.index0] }}.</span>
+                        <span>{{ opt }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+
+                <!-- Feedback -->
+                <div class="practice-feedback" style="display: none; padding: 1.15rem; border-radius: 16px; margin-top: 0.85rem; border: 2px solid #01463C;" role="alert" aria-live="polite"></div>
+
+                <!-- Hint -->
+                <div style="margin-top: 1.15rem; border-top: 1.5px dashed var(--border-color); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <button type="button" class="btn btn-secondary hint-toggle-btn" style="font-size: 0.85rem; padding: 0.4rem 0.95rem;">
+                        Need a Visual Hint?
+                    </button>
+                    <span style="font-size: 0.82rem; color: var(--text-muted);">Take all the time you need.</span>
+                </div>
+
+                <div class="practice-hint" style="display: none; background: #FFF7E6; border: 2px solid #01463C; border-radius: 16px; padding: 1.15rem; margin-top: 0.85rem; font-size: 0.92rem; color: #01463C;">
+                    <strong>Helpful Hint:</strong> {{ q.hint_hi if lang == 'hi' else q.hint_en }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+<!-- COUNSELOR STUDY TECHNIQUES & UPDATED EXERCISES -->
+<div class="card card-mint" id="study-techniques" style="margin-top: 2rem; margin-bottom: 2rem; border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 5px 0 #01463C;">
+    <div class="card-title">
+        <div>
+            <span class="role-badge-tag" style="background: #1EACB0; color: #FFFFFF; margin-bottom: 0.35rem;">Updated by School Counselor</span>
+            <h3 style="font-size: 1.55rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">
+                Easy Study Techniques &amp; Daily 10-Minute Exercises
+            </h3>
+        </div>
+        {% if student and student.ld_screening_status and student.ld_screening_status != 'None' %}
+        <span class="role-badge-tag" style="background: #F8E7CD; color: #01463C;">
+            Your Focus: {{ student.ld_category }}
+        </span>
+        {% endif %}
+    </div>
+
+    <p style="font-size: 0.96rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.35rem;">
+        Pick <strong>one</strong> calm 10-minute exercise below before homework or tests. Every guide is written in short, easy steps so reading and maths feel lighter—and you can press Read Aloud anytime.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.25rem;">
+        {% for ex in counselor_exercises %}
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 22px; padding: 1.35rem; box-shadow: 0 4px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.55rem;">
+                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                        <span class="role-badge-tag" style="background: #F3EEFF; color: #01463C;">{{ ex.study_technique }}</span>
+                        {% if student and ex.assigned_student_id == student.student_id %}
+                        <span class="role-badge-tag" style="background: #9B74FF; color: #01463C;">Assigned for You</span>
+                        {% endif %}
+                    </div>
+                    <span style="font-size: 0.78rem; font-weight: 800; color: #537D75;">{{ ex.duration_mins }} mins &bull; <span id="practice-count-{{ ex.id }}">{{ ex.practice_count }}x practiced</span></span>
+                </div>
+                <h4 style="font-size: 1.15rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">{{ ex.title }}</h4>
+                <p id="stu-ex-text-{{ ex.id }}" style="font-size: 0.9rem; color: #1F5F55; line-height: 1.5; margin-bottom: 0.75rem;">
+                    <strong>Why it helps:</strong> {{ ex.simple_goal }}
+                </p>
+                <div style="background: #FDF7EF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.85rem 1rem; margin-bottom: 0.75rem;">
+                    <div style="font-size: 0.78rem; font-weight: 800; color: #01463C; text-transform: uppercase; margin-bottom: 0.35rem;">Simple Steps:</div>
+                    <ol style="padding-left: 1.2rem; margin: 0; font-size: 0.88rem; color: #01463C; line-height: 1.55;">
+                        {% for st in ex.steps %}
+                        <li style="margin-bottom: 0.25rem;">{{ st }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                {% if ex.reference_url %}
+                <div style="font-size: 0.78rem; color: #537D75; margin-bottom: 0.75rem;">
+                    Reference: <a href="{{ ex.reference_url }}" target="_blank" rel="noopener noreferrer" style="color: #01463C; font-weight: 700; text-decoration: underline;">{{ ex.reference_source_name or ex.reference_url }}</a>
+                </div>
+                {% endif %}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                {% if ex.interactive_tool and ex.interactive_tool != 'none' %}
+                <button type="button" class="btn btn-doorbell launch-online-lab-btn"
+                        data-ex-id="{{ ex.id }}"
+                        data-tool="{{ ex.interactive_tool }}"
+                        data-title="{{ ex.title }}"
+                        data-goal="{{ ex.simple_goal }}"
+                        data-ref-name="{{ ex.reference_source_name or '' }}"
+                        data-ref-url="{{ ex.reference_url or '' }}"
+                        data-ext-name="{{ ex.external_site_name or '' }}"
+                        data-ext-url="{{ ex.external_practice_url or '' }}"
+                        style="width: 100%; font-size: 0.86rem; padding: 0.5rem;">
+                    Launch Online Exercise Here
+                </button>
+                {% endif %}
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-tts tts-btn" data-target-id="stu-ex-text-{{ ex.id }}" data-lang="{{ lang|default('en') }}" style="font-size: 0.78rem; padding: 0.38rem 0.75rem;">
+                        Read Aloud
+                    </button>
+                    {% if ex.external_practice_url %}
+                    <a href="{{ ex.external_practice_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.38rem 0.75rem;">
+                        Try on {{ ex.external_site_name or 'External Site' }} &rarr;
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-secondary practice-log-btn" data-ex-id="{{ ex.id }}" style="font-size: 0.78rem; padding: 0.38rem 0.85rem;">
+                        Mark Practiced (+1)
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% include "partials/online_exercise_lab.html" %}
+
+</div>
+
+<!-- TALK TO YOUR SCHOOL COUNSELOR & AI CHATBOT -->
+<div class="stu-tab-panel" data-panel="counselor">
+<div class="card card-sand" id="counselor-connect" style="margin-bottom: 2rem; border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 5px 0 #01463C;">
+    <div class="card-title">
+        <div>
+            <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; margin-bottom: 0.35rem;">Safe Support Desk</span>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">
+                Talk to Your School Counselor (Dr. Meera Deshmukh)
+            </h3>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin-bottom: 1.35rem;">
+        <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.9rem;">
+            <strong style="color: #01463C; font-size: 0.9rem;">Step 1: Tell What Feels Hard</strong>
+            <p style="font-size: 0.84rem; color: #1F5F55; margin: 0.25rem 0 0; line-height: 1.45;">Words look crowded, maths numbers flip, or you feel anxious during timed tests? Just write one honest line.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.9rem;">
+            <strong style="color: #01463C; font-size: 0.9rem;">Step 2: Counselor Replies With Steps</strong>
+            <p style="font-size: 0.84rem; color: #1F5F55; margin: 0.25rem 0 0; line-height: 1.45;">Dr. Deshmukh replies right inside this box and adds gentle practice tricks just for your style.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.9rem;">
+            <strong style="color: #01463C; font-size: 0.9rem;">Step 3: Parents &amp; Teachers Sync</strong>
+            <p style="font-size: 0.84rem; color: #1F5F55; margin: 0.25rem 0 0; line-height: 1.45;">Everyone supports you the exact same calm way at school and at home.</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <form method="POST" action="{{ url_for('student_send_counselor_message') }}" style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 20px; padding: 1.25rem;">
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.75rem;">Send a Private Note or Check-In</h4>
+            <div style="margin-bottom: 0.65rem;">
+                <label for="stu-req-type" style="display: block; font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">How can Counselor Ma'am help?</label>
+                <select id="stu-req-type" name="request_type" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 12px; border: 2px solid #01463C; font-family: inherit;">
+                    <option value="Check-In">Reading or Maths Trick Needed</option>
+                    <option value="Appointment Request">Request a Calm 1-on-1 Chat at School</option>
+                    <option value="Query">Question About Exam Time / Focus</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 0.65rem;">
+                <label for="stu-sub" style="display: block; font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Topic</label>
+                <input type="text" id="stu-sub" name="subject" required placeholder="e.g., Trouble reading 4-line maths word problems"
+                       style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; font-family: inherit;">
+            </div>
+            <div style="margin-bottom: 0.85rem;">
+                <label for="stu-msg" style="display: block; font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Your Message (In Simple Words)</label>
+                <textarea id="stu-msg" name="message" rows="3" required placeholder="Tell Counselor Ma'am what feels confusing..."
+                          style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; font-family: inherit;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-doorbell" style="width: 100%; padding: 0.65rem;">
+                Send Check-In to Counselor
+            </button>
+        </form>
+
+        <div>
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.75rem;">Messages &amp; Counselor Replies</h4>
+            <div style="display: grid; gap: 0.75rem;">
+                {% for cm in counselor_messages %}
+                <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 16px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                        <span style="font-size: 0.82rem; font-weight: 800; color: #01463C;">{{ cm.subject }}</span>
+                        <span class="badge-support {% if cm.status == 'Replied' %}badge-ontrack{% else %}badge-guided{% endif %}">{{ cm.status }}</span>
+                    </div>
+                    <p style="font-size: 0.86rem; color: #1F5F55; margin: 0 0 0.5rem;">{{ cm.message }}</p>
+                    {% if cm.reply %}
+                    <div style="background: #E8F7F6; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.65rem 0.85rem; font-size: 0.88rem; color: #01463C;">
+                        <strong>Dr. Meera Deshmukh:</strong> {{ cm.reply }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div style="background: #FFFFFF; border: 1.5px dashed #01463C; border-radius: 16px; padding: 1rem; color: #537D75; font-size: 0.88rem;">
+                    No messages sent yet. Use the form beside this card anytime you want friendly advice.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- STUDENT AI STUDY BUDDY CHATBOT -->
+{% with chatbot_role='student', chatbot_anchor_id='student-ai-chatbot', chatbot_title='SEHAYAK Study Buddy AI', chatbot_subtitle='Ask me any question about your weak maths questions, Q1 to Q15 visual thinking logic, easy study exercises, or reaching your School Counselor.' %}
+    {% include "partials/ai_chatbot.html" %}
+{% endwith %}
+</div>
+</div>
+
+<!-- Floating 1-Click AI Buddy Jump Button -->
+<button type="button" id="floating-ai-jump" class="btn btn-doorbell"
+        style="position: fixed; bottom: 1.35rem; right: 1.35rem; z-index: 60; border-radius: 9999px; padding: 0.7rem 1.25rem; font-size: 0.88rem; box-shadow: 0 5px 0 #01463C;">
+    Ask Study Buddy AI
+</button>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/student_practice.js') }}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const qSelect = document.getElementById("ai-q-select");
+    const loadBtn = document.getElementById("load-ai-logic-btn");
+    const resultBox = document.getElementById("ai-dynamic-result");
+
+    if (loadBtn && qSelect && resultBox) {
+        loadBtn.addEventListener("click", function () {
+            const qNum = qSelect.value;
+            loadBtn.textContent = "Loading Logic...";
+            loadBtn.disabled = true;
+
+            fetch(`/api/ai-explain-question?q=${qNum}&subject=Mathematics`)
+                .then(res => res.json())
+                .then(data => {
+                    loadBtn.textContent = "Load AI Logic →";
+                    loadBtn.disabled = false;
+                    if (data.status === "success") {
+                        const d = data.data;
+                        let stepsHtml = "";
+                        d.steps.forEach(st => {
+                            stepsHtml += `
+                                <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.85rem; box-shadow: 0 2px 0 #01463C;">
+                                    <div style="font-size: 0.75rem; font-weight: 800; color: #9B74FF;">Step ${st.step}</div>
+                                    <div style="font-weight: 800; font-size: 0.92rem; color: #01463C; margin: 0.2rem 0 0.35rem;">${st.title}</div>
+                                    <div style="font-size: 0.85rem; color: #1F5F55; line-height: 1.45;">${st.detail}</div>
+                                </div>
+                            `;
+                        });
+
+                        let optionsHtml = "";
+                        d.drill.options.forEach((opt, idx) => {
+                            const letters = ['A', 'B', 'C', 'D'];
+                            optionsHtml += `
+                                <button type="button" class="practice-option btn btn-secondary" style="padding: 0.75rem 1rem; font-size: 0.92rem; text-align: left; justify-content: flex-start; border-radius: 14px;">
+                                    <span style="font-weight: 800; margin-right: 0.5rem; color: #9B74FF;">${letters[idx]}.</span>
+                                    <span>${opt}</span>
+                                </button>
+                            `;
+                        });
+
+                        resultBox.innerHTML = `
+                            <div style="background: #E8F7F6; border: 2.5px solid #01463C; border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 0 #01463C;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                    <span class="role-badge-tag" style="background: #1EACB0; color: #01463C; border: 1.5px solid #01463C;">
+                                        Question ${d.q} &bull; ${d.concept}
+                                    </span>
+                                    <span class="role-badge-tag" style="background: #FFFFFF; color: #01463C; border: 1.5px solid #01463C;">
+                                        Max: ${d.max_marks} Marks
+                                    </span>
+                                </div>
+
+                                <h4 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                                    Thinking Logic: ${d.logic_name}
+                                </h4>
+                                <p style="font-size: 0.95rem; font-weight: 700; color: #01463C; margin-bottom: 0.85rem;">
+                                    Mental Model: <em>${d.visual_metaphor}</em>
+                                </p>
+
+                                <div style="padding: 0.75rem 1rem; background: #FFF7E6; border: 1.5px solid #F0AF00; border-radius: 12px; margin-bottom: 1rem; font-size: 0.88rem; color: #01463C;">
+                                    <strong>Why students struggle:</strong> ${d.dyslexia_barrier}
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+                                    ${stepsHtml}
+                                </div>
+
+                                <!-- Dynamic Practice Drill -->
+                                <div class="card practice-card"
+                                     data-correct-index="${d.drill.correct_index}"
+                                     data-encouraging-msg="${d.drill.explanation}"
+                                     data-tryagain-msg="Not quite. Review Step 1 and give it another try!"
+                                     style="padding: 1.25rem; background: #FFFFFF; border: 2px solid #01463C; border-radius: 16px; margin-bottom: 0; box-shadow: 0 3px 0 #01463C;">
+                                    <div style="font-size: 0.82rem; font-weight: 800; color: #9B74FF; text-transform: uppercase; margin-bottom: 0.35rem;">
+                                        Interactive Practice Question
+                                    </div>
+                                    <div style="font-size: 1rem; font-weight: 800; color: #01463C; margin-bottom: 0.85rem;">
+                                        ${d.drill.prompt}
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-bottom: 0.75rem;">
+                                        ${optionsHtml}
+                                    </div>
+                                    <div class="practice-feedback" style="display: none; padding: 0.85rem; border-radius: 12px; margin-top: 0.5rem; border: 2px solid #01463C;" role="alert" aria-live="polite"></div>
+                                    <div style="margin-top: 0.75rem; font-size: 0.82rem; color: #01463C;">
+                                        <strong>Hint:</strong> ${d.drill.hint}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        resultBox.style.display = "block";
+
+                        // Wire up options in dynamically loaded card
+                        const dynamicCard = resultBox.querySelector(".practice-card");
+                        if (dynamicCard) {
+                            const dynOptions = dynamicCard.querySelectorAll(".practice-option");
+                            const dynFeedback = dynamicCard.querySelector(".practice-feedback");
+                            const correctIdx = parseInt(dynamicCard.getAttribute("data-correct-index"));
+                            const encMsg = dynamicCard.getAttribute("data-encouraging-msg");
+                            const tryMsg = dynamicCard.getAttribute("data-tryagain-msg");
+
+                            dynOptions.forEach((btn, idx) => {
+                                btn.addEventListener("click", () => {
+                                    dynOptions.forEach(b => b.classList.remove("selected-correct", "selected-retry"));
+                                    if (idx === correctIdx) {
+                                        btn.classList.add("selected-correct");
+                                        dynFeedback.className = "practice-feedback feedback-success";
+                                        dynFeedback.innerHTML = `<div style="font-size: 1.05rem; font-weight: 800; color: #065F46;">${encMsg}</div>`;
+                                        dynFeedback.style.display = "block";
+                                        if (window.playPleasantChime) window.playPleasantChime();
+                                    } else {
+                                        btn.classList.add("selected-retry");
+                                        dynFeedback.className = "practice-feedback feedback-retry";
+                                        dynFeedback.innerHTML = `<div style="font-size: 0.92rem; font-weight: 700; color: #92400E;">${tryMsg}</div>`;
+                                        dynFeedback.style.display = "block";
+                                    }
+                                });
+                            });
+                        }
+                    }
+                })
+                .catch(err => {
+                    loadBtn.textContent = "Load AI Logic →";
+                    loadBtn.disabled = false;
+                    console.error("Failed to load AI logic:", err);
+                });
+        });
+    }
+
+    // 1. Workspace Tab Switcher (Puts Practice Sessions & Study Tricks right at the top!)
+    const tabBtns = document.querySelectorAll(".stu-tab-btn");
+    const tabPanels = document.querySelectorAll(".stu-tab-panel");
+
+    function activatePortalTab(tabKey) {
+        tabBtns.forEach(btn => btn.classList.toggle("active", btn.getAttribute("data-tab") === tabKey));
+        tabPanels.forEach(panel => {
+            const pKey = panel.getAttribute("data-panel");
+            panel.style.display = (tabKey === "all" || pKey === tabKey) ? "block" : "none";
+        });
+    }
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener("click", function() {
+            const key = btn.getAttribute("data-tab");
+            activatePortalTab(key);
+        });
+    });
+
+    // Smart initial tab resolution from query params or hash
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    let initialTab = params.get("tab") || "practice";
+    if (!params.get("tab")) {
+        if (hash === "#ai-paper-clinic" || params.has("paper_subject")) {
+            initialTab = "clinic";
+        } else if (hash === "#counselor-connect" || hash === "#student-ai-chatbot") {
+            initialTab = "counselor";
+        } else if (params.has("subject") || hash === "#study-techniques" || hash === "#quick-practice") {
+            initialTab = "practice";
+        }
+    }
+    activatePortalTab(initialTab);
+    if (hash) {
+        const targetEl = document.querySelector(hash);
+        if (targetEl) {
+            setTimeout(() => targetEl.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+        }
+    }
+
+    const aiJumpBtn = document.getElementById("floating-ai-jump");
+    if (aiJumpBtn) {
+        aiJumpBtn.addEventListener("click", function() {
+            activatePortalTab("counselor");
+            const bot = document.getElementById("student-ai-chatbot");
+            if (bot) bot.scrollIntoView({ behavior: "smooth", block: "start" });
+            const chatInput = document.getElementById("chatbot-input-student");
+            if (chatInput) setTimeout(() => chatInput.focus(), 250);
+        });
+    }
+
+    // 2. Bite-Sized Practice Focus Card Deck (1 question at a time - zero scrolling!)
+    const drillCards = Array.from(document.querySelectorAll(".quick-drill-item"));
+    const prevBtn = document.getElementById("drill-prev-btn");
+    const nextBtn = document.getElementById("drill-next-btn");
+    const expandAllBtn = document.getElementById("toggle-all-drills-btn");
+    const counterLabel = document.getElementById("drill-counter-label");
+    const stepPills = document.querySelectorAll(".drill-step-pill");
+    const deckNav = document.getElementById("drill-deck-nav");
+    let currentDrillIdx = 0;
+    let expandedAll = false;
+
+    function renderDrillDeck() {
+        if (drillCards.length === 0) return;
+        drillCards.forEach((card, i) => {
+            card.style.display = (expandedAll || i === currentDrillIdx) ? "block" : "none";
+        });
+        if (counterLabel) {
+            counterLabel.textContent = "Question " + (currentDrillIdx + 1) + " of " + drillCards.length;
+        }
+        stepPills.forEach(p => {
+            const pIdx = parseInt(p.getAttribute("data-drill-idx"), 10);
+            p.classList.toggle("active", pIdx === currentDrillIdx);
+        });
+        if (prevBtn) prevBtn.disabled = currentDrillIdx <= 0;
+        if (nextBtn) nextBtn.disabled = currentDrillIdx >= drillCards.length - 1;
+    }
+
+    if (drillCards.length > 0) {
+        renderDrillDeck();
+        if (prevBtn) prevBtn.addEventListener("click", () => { if (currentDrillIdx > 0) { currentDrillIdx--; renderDrillDeck(); } });
+        if (nextBtn) nextBtn.addEventListener("click", () => { if (currentDrillIdx < drillCards.length - 1) { currentDrillIdx++; renderDrillDeck(); } });
+        stepPills.forEach(pill => {
+            pill.addEventListener("click", () => {
+                expandedAll = false;
+                if (expandAllBtn) expandAllBtn.textContent = "Expand All (" + drillCards.length + ")";
+                currentDrillIdx = parseInt(pill.getAttribute("data-drill-idx"), 10) || 0;
+                renderDrillDeck();
+            });
+        });
+        if (expandAllBtn) {
+            expandAllBtn.addEventListener("click", () => {
+                expandedAll = !expandedAll;
+                expandAllBtn.textContent = expandedAll ? "Focus 1-by-1 View" : ("Expand All (" + drillCards.length + ")");
+                if (deckNav) deckNav.style.opacity = expandedAll ? "0.6" : "1";
+                renderDrillDeck();
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

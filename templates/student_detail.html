@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+    <div>
+        <a href="{{ url_for('dashboard') }}" style="font-size: 0.92rem; color: #01463C; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+            &larr; Back to Dashboard
+        </a>
+        <h2 style="font-size: 1.85rem; font-weight: 800; color: #01463C; margin-top: 0.2rem; letter-spacing: -0.02em;">
+            {{ student.name }} ({{ student.student_id }})
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            Grade {{ student.grade }} - Section {{ student.section }} &bull; Gender: {{ student.gender }}
+        </p>
+    </div>
+
+    <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+        <button class="btn btn-tts tts-btn" data-target-id="diagnostic-summary-box" data-lang="{{ lang }}">
+            Listen to Summary
+        </button>
+        {% if answer_sheet %}
+        <a href="{{ url_for('view_answer_sheet', sheet_id=answer_sheet.id) }}" class="btn btn-secondary">
+            View Answer Sheet (Q1-15 Front Cover)
+        </a>
+        {% else %}
+        <a href="{{ url_for('upload_answer_sheet_view') }}" class="btn btn-secondary">
+            + Grade Answer Sheet
+        </a>
+        {% endif %}
+        <a href="{{ url_for('print_report', student_id=student.student_id) }}" target="_blank" class="btn btn-secondary">
+            {{ t('download_report_pdf') }}
+        </a>
+        <a href="{{ url_for('remedial_plan_view', student_id=student.student_id) }}" class="btn btn-doorbell">
+            {{ t('generate_remedial_plan') }}
+        </a>
+    </div>
+</div>
+
+<!-- Support Status Banner -->
+<div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; background: #FFFFFF; padding: 2rem 2.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+        <div>
+            <span style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+                Assessed Support Classification
+            </span>
+            <div style="font-size: 1.6rem; font-weight: 800; margin-top: 0.35rem;">
+                {% if student.risk_level == 'HIGH' %}
+                    <span style="color: #DC2626;"><span class="status-dot status-priority-dot"></span> {{ t('priority_support') }}</span>
+                {% elif student.risk_level == 'MODERATE' %}
+                    <span style="color: #D97706;"><span class="status-dot status-guided-dot"></span> {{ t('guided_support') }}</span>
+                {% else %}
+                    <span style="color: #059669;"><span class="status-dot status-ontrack-dot"></span> {{ t('on_track') }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1.75rem; flex-wrap: wrap;">
+            <div style="background: var(--bg-surface-alt); padding: 0.75rem 1.25rem; border-radius: 16px; border: 1.5px solid #01463C; text-align: center;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Calculated Risk Score</div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: #01463C;">{{ "%.2f"|format(student.risk_score) }} / 1.0</div>
+            </div>
+            <div style="background: var(--bg-surface-alt); padding: 0.75rem 1.25rem; border-radius: 16px; border: 1.5px solid #01463C; text-align: center;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Attendance Health</div>
+                <div style="font-size: 1.35rem; font-weight: 800; {% if student.attendance_rate < 75.0 %}color: #DC2626;{% else %}color: #01463C;{% endif %}">
+                    {{ "%.1f"|format(student.attendance_rate) }}%
+                </div>
+            </div>
+            <div style="background: var(--bg-surface-alt); padding: 0.75rem 1.25rem; border-radius: 16px; border: 1.5px solid #01463C; text-align: center;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Overall Marks</div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: #01463C;">{{ "%.1f"|format(student.overall_avg) }}%</div>
+            </div>
+            <div style="background: var(--bg-surface-alt); padding: 0.75rem 1.25rem; border-radius: 16px; border: 1.5px solid #01463C; text-align: center;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Reading Fluency Pacing</div>
+                <div style="font-size: 1.35rem; font-weight: 800; color: #01463C;">{{ student.reading_speed_wpm|int }} WPM</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Teacher Remarks on Student Answer Sheets & Observed Weaknesses / Improvements -->
+<div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+    <div class="card-title">
+        <span>Teacher Diagnostic Remarks: Observed Weaknesses & Improvements</span>
+        {% if answer_sheet %}
+        <a href="{{ url_for('view_answer_sheet', sheet_id=answer_sheet.id) }}" class="btn btn-doorbell" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+            View Official CBSE Answer Sheet (Q1-15)
+        </a>
+        {% else %}
+        <a href="{{ url_for('upload_answer_sheet_view') }}" class="btn btn-doorbell" style="font-size: 0.85rem; padding: 0.4rem 1rem;">
+            + Grade Answer Sheet
+        </a>
+        {% endif %}
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+        <!-- Weaknesses -->
+        <div style="background: #FEF2F2; border: 2px solid #DC2626; border-radius: 18px; padding: 1.35rem; box-shadow: 0 2px 0 #DC2626;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="status-dot status-priority-dot"></span>
+                <h4 style="font-size: 1.1rem; font-weight: 800; color: #991B1B; margin: 0;">
+                    Where Weaknesses & Gaps Were Observed:
+                </h4>
+            </div>
+            <p style="font-size: 0.95rem; color: #7F1D1D; line-height: 1.55; margin: 0;">
+                {{ student.teacher_weaknesses or (answer_sheet.teacher_weaknesses if answer_sheet else 'No specific weaknesses recorded yet. Enter diagnostic notes below.') }}
+            </p>
+        </div>
+
+        <!-- Improvements -->
+        <div style="background: #ECFDF5; border: 2px solid #059669; border-radius: 18px; padding: 1.35rem; box-shadow: 0 2px 0 #059669;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="status-dot status-ontrack-dot"></span>
+                <h4 style="font-size: 1.1rem; font-weight: 800; color: #065F46; margin: 0;">
+                    Where Improvements & Growth Were Observed:
+                </h4>
+            </div>
+            <p style="font-size: 0.95rem; color: #064E3B; line-height: 1.55; margin: 0;">
+                {{ student.teacher_improvements or (answer_sheet.teacher_improvements if answer_sheet else 'Consistent steady performance across observed terms.') }}
+            </p>
+        </div>
+    </div>
+
+    {% if student.teacher_remarks or (answer_sheet and answer_sheet.teacher_general_remarks) %}
+    <div style="background: var(--bg-surface-alt); border-radius: 16px; border: 1.5px solid #01463C; padding: 1rem 1.35rem; font-size: 0.95rem; color: #01463C; margin-bottom: 1.25rem;">
+        <strong>Remedial Recommendation:</strong> {{ student.teacher_remarks or answer_sheet.teacher_general_remarks }}
+    </div>
+    {% endif %}
+
+    <!-- Accordion to Update Teacher Remarks -->
+    <details style="font-size: 0.92rem; color: var(--text-secondary);">
+        <summary style="cursor: pointer; font-weight: 700; color: #01463C;">
+            Click to Edit / Update Teacher Observations for this Student
+        </summary>
+        <form method="POST" action="{{ url_for('update_student_remarks_view', student_id=student.student_id) }}" style="margin-top: 1.25rem; background: var(--bg-surface-alt); padding: 1.5rem; border-radius: 20px; border: 2px solid #01463C;">
+            <div style="margin-bottom: 1.15rem;">
+                <label for="tw" style="display: block; font-weight: 800; color: #991B1B; margin-bottom: 0.35rem;">
+                    Where Weaknesses / Gaps Were Observed (e.g. Question sequences, specific errors):
+                </label>
+                <textarea id="tw" name="teacher_weaknesses" rows="2" style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #DC2626; background: #FFF5F5; font-family: inherit; font-size: 0.95rem;">{{ student.teacher_weaknesses or '' }}</textarea>
+            </div>
+            <div style="margin-bottom: 1.15rem;">
+                <label for="ti" style="display: block; font-weight: 800; color: #065F46; margin-bottom: 0.35rem;">
+                    Where Improvements & Growth Were Observed:
+                </label>
+                <textarea id="ti" name="teacher_improvements" rows="2" style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #059669; background: #F0FDF4; font-family: inherit; font-size: 0.95rem;">{{ student.teacher_improvements or '' }}</textarea>
+            </div>
+            <div style="margin-bottom: 1.25rem;">
+                <label for="tr" style="display: block; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                    General Pedagogical Advice & Action Items:
+                </label>
+                <textarea id="tr" name="teacher_remarks" rows="2" style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.95rem;">{{ student.teacher_remarks or '' }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-doorbell" style="padding: 0.65rem 1.75rem; font-size: 0.95rem;">
+                Save Observations
+            </button>
+        </form>
+    </details>
+</div>
+
+<!-- Explainability: Why was this student flagged? & Student Strengths -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Identified Barriers / Risk Drivers -->
+    <div class="card" id="diagnostic-summary-box" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 0;">
+        <div class="card-title" style="color: #991B1B;">
+            <span>{{ t('top_risk_reasons') }}</span>
+        </div>
+        <ul style="list-style-type: none; padding-left: 0;">
+            {% for reason in explain.reasons %}
+            <li style="padding: 0.85rem 1.15rem; margin-bottom: 0.65rem; background: #FEF2F2; border-radius: 14px; border: 1.5px solid #DC2626; font-size: 0.95rem; color: #991B1B; display: flex; align-items: center; gap: 0.65rem;">
+                <span class="status-dot status-priority-dot"></span>
+                <span>{{ reason }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        <div style="margin-top: 1rem; font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55;">
+            <em>{{ explain.takeaway }}</em>
+        </div>
+    </div>
+
+    <!-- Identified Student Strengths (Encouraging Scaffold) -->
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 0;">
+        <div class="card-title" style="color: #065F46;">
+            <span>{{ t('student_strengths') }}</span>
+        </div>
+        <ul style="list-style-type: none; padding-left: 0;">
+            {% for str in explain.strengths %}
+            <li style="padding: 0.85rem 1.15rem; margin-bottom: 0.65rem; background: #ECFDF5; border-radius: 14px; border: 1.5px solid #059669; font-size: 0.95rem; color: #065F46; display: flex; align-items: center; gap: 0.65rem;">
+                <span class="status-dot status-ontrack-dot"></span>
+                <span>{{ str }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        <div style="margin-top: 1rem; padding: 1rem 1.25rem; background: #E8F7F6; border-radius: 14px; border: 1.5px solid #01463C; font-size: 0.92rem; color: #01463C;">
+            <strong>Teacher Tip:</strong> Anchor remedial sessions in the student's natural strengths to maintain positive momentum.
+        </div>
+    </div>
+</div>
+
+<!-- Local Feature Contributions Breakdown (SHAP-Style) -->
+<div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+    <div class="card-title">
+        <span>Local Feature Contributions (SHAP-Style Factor Attribution)</span>
+        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Red = Risk Driver, Green = Protective Strength</span>
+    </div>
+    <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        Quantifies the individual weight of each educational dimension pushing toward or protecting against the support threshold.
+    </p>
+    <div id="feature-contrib-chart"></div>
+</div>
+
+<!-- Performance Breakdown & Trend Chart -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Subject Marks Table -->
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 0;">
+        <div class="card-title">Subject Assessment Marks</div>
+        <div class="table-responsive" style="border: 2px solid #01463C; border-radius: 20px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>FA1</th>
+                        <th>SA1</th>
+                        <th>FA2</th>
+                        <th>SA2</th>
+                        <th>Delta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub, sub_name in [('math', 'Mathematics'), ('science', 'Science'), ('english', 'English'), ('social', 'Social Science'), ('hindi', 'Hindi')] %}
+                    {% set sa1 = student[sub ~ '_sa1'] %}
+                    {% set sa2 = student[sub ~ '_sa2'] %}
+                    {% set diff = sa2 - sa1 %}
+                    <tr>
+                        <td style="font-weight: 700; color: #01463C;">{{ sub_name }}</td>
+                        <td>{{ "%.1f"|format(student[sub ~ '_fa1']) }}</td>
+                        <td>{{ "%.1f"|format(sa1) }}</td>
+                        <td>{{ "%.1f"|format(student[sub ~ '_fa2']) }}</td>
+                        <td style="font-weight: 800; {% if sa2 < 35.0 %}color: #DC2626;{% elif sa2 < 50.0 %}color: #D97706;{% endif %}">
+                            {{ "%.1f"|format(sa2) }}
+                        </td>
+                        <td>
+                            {% if diff > 0 %}
+                                <span style="color: #059669; font-weight: 800;">+{{ "%.1f"|format(diff) }}</span>
+                            {% elif diff < 0 %}
+                                <span style="color: #DC2626; font-weight: 800;">{{ "%.1f"|format(diff) }}</span>
+                            {% else %}
+                                0.0
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Student Score Trajectory Chart -->
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 0;">
+        <div class="card-title">Marks Progression Over Terms</div>
+        <div id="student-trend-chart"></div>
+    </div>
+</div>
+
+<!-- Learning Support Profile & Direct School Counselor Coordination -->
+<div class="card card-mint" style="margin-bottom: 2rem;" id="counselor-teacher-connect">
+    <div class="card-title">
+        <span>Learning Disability / Early Screening Profile &amp; Counselor Connect</span>
+        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center;">
+            {% set stu_prio = student.counselor_priority or 'Not Priority' %}
+            <span class="badge-support {% if stu_prio == 'Priority' %}badge-priority{% elif stu_prio == 'Monitoring' %}badge-guided{% else %}badge-ontrack{% endif %}">
+                Counselor Status: {{ stu_prio }}
+            </span>
+            <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF;">
+                {{ student.ld_screening_status if student.ld_screening_status and student.ld_screening_status != 'None' else 'No Active Screening Flag' }}
+            </span>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.25rem;">
+            <div style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: #537D75; margin-bottom: 0.3rem;">
+                Focus Category: {{ student.ld_category or 'General Classroom Support' }}
+            </div>
+            <p style="font-size: 0.94rem; color: #01463C; line-height: 1.55; margin-bottom: 0.85rem;">
+                {{ student.ld_notes or 'No specific learning disability flag recorded yet. Use the form beside this card if classroom observation suggests reading, writing, numeracy, or pacing difficulty.' }}
+            </p>
+            {% if counselor_exercises %}
+            <div style="background: #F8E7CD; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.75rem 0.95rem;">
+                <div style="font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                    Recommended Counselor Exercises to Assign:
+                </div>
+                <ul style="padding-left: 1.15rem; margin: 0; font-size: 0.86rem; color: #1F5F55; line-height: 1.5;">
+                    {% for ex in counselor_exercises %}
+                    <li><strong>{{ ex.title }}</strong> ({{ ex.study_technique }} &bull; {{ ex.duration_mins }}m)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if session.get('user', {}).get('role') in ['teacher', 'principal'] %}
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.25rem;">
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.65rem;">
+                Refer or Message School Counselor (Dr. Meera Deshmukh)
+            </h4>
+            <form method="POST" action="{{ url_for('teacher_counselor_referral') }}">
+                <input type="hidden" name="student_id" value="{{ student.student_id }}">
+                <input type="hidden" name="redirect_to" value="detail">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.65rem;">
+                    <div>
+                        <label for="td-ld-stat" style="display: block; font-size: 0.78rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Screening Group</label>
+                        <select id="td-ld-stat" name="ld_screening_status" style="width: 100%; padding: 0.45rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.84rem;">
+                            {% for st in ld_statuses %}
+                            <option value="{{ st }}" {% if student.ld_screening_status == st %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="td-ld-cat" style="display: block; font-size: 0.78rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Focus Category</label>
+                        <select id="td-ld-cat" name="ld_category" style="width: 100%; padding: 0.45rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.84rem;">
+                            {% for cat in ld_categories %}
+                            <option value="{{ cat }}" {% if student.ld_category == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" name="request_type" value="Referral">
+                <input type="text" name="subject" required placeholder="Short Subject (e.g., Reading Fluency & Question Decoding Check)"
+                       style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.86rem; margin-bottom: 0.55rem;">
+                <textarea name="message" rows="2" required placeholder="Share what difficulty you noticed in class or exam sheets..."
+                          style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.86rem; margin-bottom: 0.65rem;"></textarea>
+                <button type="submit" class="btn btn-doorbell" style="width: 100%; font-size: 0.88rem; padding: 0.55rem;">
+                    Send Observation &amp; Referral to Counselor
+                </button>
+            </form>
+        </div>
+        {% elif session.get('user', {}).get('role') == 'counselor' %}
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.25rem;">
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.45rem;">
+                Counselor Triage: Mark Priority, Monitoring, or Not Priority
+            </h4>
+            <p style="font-size: 0.84rem; color: #537D75; margin-bottom: 0.75rem;">
+                Set how closely {{ student.name }} needs counseling follow-up right now:
+            </p>
+            {% set cur_prio = student.counselor_priority or 'Not Priority' %}
+            <form method="POST" action="{{ url_for('counselor_set_priority') }}" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <input type="hidden" name="student_id" value="{{ student.student_id }}">
+                <input type="hidden" name="redirect_to" value="detail">
+                <button type="submit" name="counselor_priority" value="Priority"
+                        style="flex: 1; min-width: 90px; font-size: 0.84rem; font-weight: 800; padding: 0.5rem 0.75rem; border-radius: 9999px; cursor: pointer; font-family: inherit; border: 2px solid #991B1B; {% if cur_prio == 'Priority' %}background: #DC2626; color: #FFFFFF;{% else %}background: #FEF2F2; color: #991B1B;{% endif %}">
+                    Priority
+                </button>
+                <button type="submit" name="counselor_priority" value="Monitoring"
+                        style="flex: 1; min-width: 90px; font-size: 0.84rem; font-weight: 800; padding: 0.5rem 0.75rem; border-radius: 9999px; cursor: pointer; font-family: inherit; border: 2px solid #92400E; {% if cur_prio == 'Monitoring' %}background: #D97706; color: #FFFFFF;{% else %}background: #FFF7E6; color: #92400E;{% endif %}">
+                    Monitoring
+                </button>
+                <button type="submit" name="counselor_priority" value="Not Priority"
+                        style="flex: 1; min-width: 90px; font-size: 0.84rem; font-weight: 800; padding: 0.5rem 0.75rem; border-radius: 9999px; cursor: pointer; font-family: inherit; border: 2px solid #01463C; {% if cur_prio == 'Not Priority' %}background: #01463C; color: #FDF7EF;{% else %}background: #E8F7F6; color: #01463C;{% endif %}">
+                    Not Priority
+                </button>
+            </form>
+
+            <form method="POST" action="{{ url_for('counselor_update_student_ld') }}" style="border-top: 1.5px dashed #01463C; padding-top: 0.85rem;">
+                <input type="hidden" name="student_id" value="{{ student.student_id }}">
+                <input type="hidden" name="redirect_to" value="detail">
+                <input type="hidden" name="counselor_priority" value="{{ cur_prio }}">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 0.55rem;">
+                    <div>
+                        <label for="cd-ld-stat" style="display: block; font-size: 0.76rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Support Section</label>
+                        <select id="cd-ld-stat" name="ld_screening_status" style="width: 100%; padding: 0.42rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
+                            {% for st in ld_statuses %}
+                            <option value="{{ st }}" {% if student.ld_screening_status == st %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                            <option value="None" {% if not student.ld_screening_status or student.ld_screening_status == 'None' %}selected{% endif %}>No Active Screening Flag</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cd-ld-cat" style="display: block; font-size: 0.76rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Focus Category</label>
+                        <select id="cd-ld-cat" name="ld_category" style="width: 100%; padding: 0.42rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
+                            {% for cat in ld_categories %}
+                            <option value="{{ cat }}" {% if student.ld_category == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <textarea name="ld_notes" rows="2" placeholder="Update counselor observation notes..."
+                          style="width: 100%; padding: 0.45rem 0.7rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.84rem; margin-bottom: 0.5rem;">{{ student.ld_notes or '' }}</textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; color: #01463C;">
+                        <input type="checkbox" name="counselor_referred" value="1" {% if student.counselor_referred %}checked{% endif %}> Active Follow-Up
+                    </label>
+                    <button type="submit" class="btn btn-doorbell" style="font-size: 0.82rem; padding: 0.42rem 1rem;">
+                        Save Profile &amp; Notes
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if counselor_messages %}
+    <div>
+        <div style="font-size: 0.85rem; font-weight: 800; color: #01463C; margin-bottom: 0.5rem;">Recent Counselor Thread for {{ student.name }}:</div>
+        <div style="display: grid; gap: 0.65rem;">
+            {% for cm in counselor_messages[:3] %}
+            <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.8rem 1rem;">
+                <div style="font-size: 0.8rem; font-weight: 800; color: #01463C;">
+                    [{{ cm.sender_role|title }} &bull; {{ cm.request_type }}] {{ cm.subject }} &mdash; <span style="color: #059669;">{{ cm.status }}</span>
+                </div>
+                <div style="font-size: 0.86rem; color: #1F5F55; margin-top: 0.25rem;">{{ cm.message }}</div>
+                {% if cm.reply %}
+                <div style="margin-top: 0.45rem; background: #E8F7F6; border-radius: 10px; padding: 0.5rem 0.75rem; font-size: 0.85rem; color: #01463C;">
+                    <strong>Counselor Reply:</strong> {{ cm.reply }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    renderStudentTrend(
+        {{ student.overall_avg - 2.5 }},
+        {{ student.term1_avg }},
+        {{ student.overall_avg + 1.0 }},
+        {{ student.term2_avg }}
+    );
+
+    const contributions = {{ explain.contributions | tojson }};
+    renderFeatureContributionsChart(contributions);
+});
+</script>
+{% endblock %}

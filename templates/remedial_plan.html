@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1050px; margin: 1rem auto;">
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+        <div>
+            <a href="{{ url_for('student_detail', student_id=student.student_id) }}" style="font-size: 0.92rem; color: #01463C; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+                &larr; Back to Diagnostic Profile
+            </a>
+            <h2 style="font-size: 1.85rem; font-weight: 800; color: #01463C; margin-top: 0.2rem; letter-spacing: -0.02em;">
+                Individual Remedial Action Plan & RTI Tracker
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Learner: <strong>{{ student.name }}</strong> ({{ student.student_id }}) &bull; Grade {{ student.grade }}-{{ student.section }}
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <button class="btn btn-tts tts-btn" data-target-id="remedial-plan-container" data-lang="{{ lang }}">
+                Read Aloud Plan
+            </button>
+            <a href="{{ url_for('print_report', student_id=student.student_id) }}" target="_blank" class="btn btn-secondary">
+                Print / Save PDF
+            </a>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('save_plan', student_id=student.student_id) }}" id="rti-plan-form">
+        <!-- RTI Progress Tracker Bar Card -->
+        {% set current_progress = saved_plan.progress_pct if saved_plan and saved_plan.progress_pct else 0 %}
+        <div class="card card-sand" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                <div>
+                    <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C; margin-bottom: 0.35rem;">
+                        Response to Intervention (RTI) Progress
+                    </span>
+                    <h3 style="font-size: 1.4rem; font-weight: 800; color: #01463C; margin-top: 0.25rem;">
+                        Remedial Milestone Completion: <span id="progress-pct-display">{{ current_progress }}%</span>
+                    </h3>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <label for="post_remedial_score" style="font-size: 0.85rem; font-weight: 700; display: block; color: #01463C; margin-bottom: 0.25rem;">
+                            Post-Intervention Score (%)
+                        </label>
+                        <input type="number" id="post_remedial_score" name="post_remedial_score" step="0.5" min="0" max="100"
+                               value="{{ saved_plan.post_remedial_score if saved_plan and saved_plan.post_remedial_score is not none else '' }}"
+                               placeholder="e.g. 64.5"
+                               style="width: 130px; padding: 0.5rem 0.75rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-weight: 800; font-size: 0.95rem;">
+                    </div>
+                    <button type="submit" class="btn btn-doorbell" style="padding: 0.65rem 1.5rem; font-size: 0.95rem; margin-top: 1rem;">
+                        Save Progress & Notes
+                    </button>
+                </div>
+            </div>
+
+            <input type="hidden" name="progress_pct" id="progress_pct_input" value="{{ current_progress }}">
+
+            <!-- Visual Progress Bar -->
+            <div style="background: #FFFFFF; height: 16px; border-radius: 9999px; overflow: hidden; border: 2px solid #01463C; padding: 1px;">
+                <div id="rti-progress-bar-fill"
+                     style="background: linear-gradient(90deg, #9B74FF, #1EACB0); height: 100%; border-radius: 9999px; width: {{ current_progress }}%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+        <div id="remedial-plan-container">
+            <!-- Selected Strategies Matrix -->
+            <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+                <div class="card-title">
+                    <span>Tailored Pedagogical Strategies</span>
+                    <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Evidence-based Interventions</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                    {% for strat in plan.strategies %}
+                    <div style="background: var(--bg-surface-alt); border: 2px solid #01463C; border-radius: 18px; padding: 1.35rem; box-shadow: 0 3px 0 #01463C;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                            <span class="role-badge-tag" style="background: #FFFFFF; color: #01463C; border: 1.5px solid #01463C;">
+                                {{ strat.category }}
+                            </span>
+                            <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">{{ strat.id }}</span>
+                        </div>
+                        <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem; color: #01463C;">
+                            {{ strat.title_hi if lang == 'hi' else strat.title_en }}
+                        </h4>
+                        <p style="font-size: 0.9rem; color: #1F5F55; margin-bottom: 0.85rem; line-height: 1.5;">
+                            {{ strat.description_hi if lang == 'hi' else strat.description_en }}
+                        </p>
+                        <div style="font-size: 0.85rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">Teacher Action Items:</div>
+                        <ul style="font-size: 0.85rem; padding-left: 1.25rem; color: var(--text-secondary); line-height: 1.5;">
+                            {% for act in strat.teacher_actions %}
+                            <li style="margin-bottom: 0.35rem;">{{ act }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 4-Week Structured Roadmap with Interactive Checkboxes -->
+            <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+                <div class="card-title">
+                    <span>4-Week Structured Learning Cycle & Checklist</span>
+                    <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Check off milestones as completed</span>
+                </div>
+
+                {% set completed_list = saved_plan.completed_milestones if saved_plan and saved_plan.completed_milestones else [] %}
+
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    {% for week in plan.four_week_plan %}
+                    <div style="border: 2px solid #01463C; background: var(--bg-surface-alt); border-radius: 18px; padding: 1.35rem; box-shadow: 0 3px 0 #01463C;">
+                        <div style="font-size: 1.15rem; font-weight: 800; color: #01463C; margin-bottom: 0.3rem;">
+                            {{ week.title }}
+                        </div>
+                        <div style="font-size: 0.92rem; font-weight: 700; color: #1F5F55; margin-bottom: 0.85rem;">
+                            Goal: {{ week.goal }}
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                            {% for t in week.tasks %}
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.92rem; cursor: pointer; padding: 0.65rem 0.85rem; border-radius: 12px; background: #FFFFFF; border: 1.5px solid #01463C;">
+                                <input type="checkbox" name="milestones" value="{{ t.id }}" class="milestone-checkbox"
+                                       {% if t.id in completed_list %}checked{% endif %}
+                                       style="margin-top: 0.2rem; transform: scale(1.2); cursor: pointer; accent-color: #9B74FF;">
+                                <span style="flex: 1; color: #01463C; {% if t.id in completed_list %}text-decoration: line-through; opacity: 0.75;{% endif %}">
+                                    {{ t.text }}
+                                </span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Parent Partnership Tips -->
+            <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+                <div class="card-title">
+                    <span>Home Learning & Parent Partnership Guidance</span>
+                </div>
+                <ul style="list-style-type: none; padding-left: 0; display: flex; flex-direction: column; gap: 0.65rem;">
+                    {% for tip in plan.parent_tips %}
+                    <li style="padding: 0.75rem 1rem; background: var(--bg-surface-alt); border-radius: 14px; border: 1.5px solid var(--border-color); font-size: 0.92rem; color: #01463C; display: flex; align-items: center; gap: 0.65rem;">
+                        <span class="status-dot status-ontrack-dot"></span>
+                        <span>{{ tip }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Teacher Notes & Buddy Assignment Persistence Form -->
+        <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+            <div class="card-title">Educator Implementation Notes & Peer Buddy</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                <div>
+                    <label for="assigned_buddy" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Assigned Peer Study Buddy
+                    </label>
+                    <input type="text" id="assigned_buddy" name="assigned_buddy" value="{{ saved_plan.assigned_buddy if saved_plan else '' }}"
+                           placeholder="e.g. Diya Patel (High Confidence Peer Mentor)"
+                           style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 0.92rem;">
+                </div>
+                <div>
+                    <label for="status" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Remediation Cycle Status
+                    </label>
+                    <select id="status" name="status" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 0.92rem;">
+                        <option value="Active" {% if saved_plan and saved_plan.status == 'Active' %}selected{% endif %}>Active In-Progress</option>
+                        <option value="Review Scheduled" {% if saved_plan and saved_plan.status == 'Review Scheduled' %}selected{% endif %}>Review Scheduled</option>
+                        <option value="Completed" {% if saved_plan and saved_plan.status == 'Completed' %}selected{% endif %}>Mastery Achieved</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label for="teacher_notes" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                    Observations & Adaptation Notes
+                </label>
+                <textarea id="teacher_notes" name="teacher_notes" rows="3"
+                          placeholder="Add observations on how the learner responded to visual aids and peer sessions..."
+                          style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-family: inherit; font-size: 0.92rem;">{{ saved_plan.teacher_notes if saved_plan else '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-doorbell" style="padding: 0.75rem 2.25rem; font-size: 1rem;">
+                Save Plan, RTI Progress & Notes
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(".milestone-checkbox");
+    const progressText = document.getElementById("progress-pct-display");
+    const progressFill = document.getElementById("rti-progress-bar-fill");
+    const progressInput = document.getElementById("progress_pct_input");
+
+    function updateProgress() {
+        const total = checkboxes.length;
+        if (total === 0) return;
+        let checked = 0;
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                checked++;
+                cb.nextElementSibling.style.textDecoration = "line-through";
+                cb.nextElementSibling.style.opacity = "0.75";
+            } else {
+                cb.nextElementSibling.style.textDecoration = "none";
+                cb.nextElementSibling.style.opacity = "1";
+            }
+        });
+        const pct = Math.round((checked / total) * 100);
+        if (progressText) progressText.textContent = `${pct}%`;
+        if (progressFill) progressFill.style.width = `${pct}%`;
+        if (progressInput) progressInput.value = pct;
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener("change", updateProgress);
+    });
+});
+</script>
+{% endblock %}

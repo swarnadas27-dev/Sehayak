@@ -1,0 +1,611 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 980px; margin: 1rem auto;">
+    <!-- Parent Banner & Warm Welcome -->
+    <div class="card card-sand" style="border: 2.5px solid #01463C; border-radius: 28px; padding: 2.25rem 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 0 #01463C;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+            <div>
+                <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C;">
+                    Family Learning & Progress Portal
+                </span>
+                <h2 style="font-size: 1.95rem; font-weight: 800; margin-top: 0.6rem; margin-bottom: 0.35rem; color: #01463C; letter-spacing: -0.02em;">
+                    Welcome, {{ session.get('user', {}).get('full_name', 'Parent / Guardian') }}
+                </h2>
+                <p style="font-size: 1rem; color: #1F5F55; line-height: 1.55;">
+                    Child: <strong>{{ student.name }}</strong> (ID: {{ student.student_id }}) &bull; Class {{ student.grade }}-{{ student.section }} &bull; Assigned Teacher: <strong>{{ teacher_name }}</strong>
+                </p>
+            </div>
+
+            <div style="text-align: right; display: flex; gap: 0.5rem;">
+                <button class="btn btn-tts tts-btn" data-target-id="parent-summary-text" data-lang="{{ lang }}">
+                    Read Aloud
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parent Quick-Switch Tab Bar (No Long Scrolling!) -->
+    <div id="parent-workspace-tabs"
+         style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; background: #E8F7F6; border: 2.5px solid #01463C; border-radius: 22px; padding: 0.7rem 0.9rem; margin-bottom: 1.75rem; box-shadow: 0 4px 0 #01463C; position: sticky; top: 0.65rem; z-index: 40;">
+        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary par-tab-btn active" data-tab="exercises"
+                    style="font-size: 0.86rem; padding: 0.48rem 1rem; border-radius: 9999px;">
+                Home Exercises &amp; LD Support
+            </button>
+            <button type="button" class="btn btn-secondary par-tab-btn" data-tab="overview"
+                    style="font-size: 0.86rem; padding: 0.48rem 1rem; border-radius: 9999px;">
+                Strengths &amp; Scores
+            </button>
+            <button type="button" class="btn btn-secondary par-tab-btn" data-tab="sheet"
+                    style="font-size: 0.86rem; padding: 0.48rem 1rem; border-radius: 9999px;">
+                Answer Sheet &amp; Remarks
+            </button>
+            <button type="button" class="btn btn-secondary par-tab-btn" data-tab="connect"
+                    style="font-size: 0.86rem; padding: 0.48rem 1rem; border-radius: 9999px;">
+                Teacher &amp; Counselor Chat
+            </button>
+            <button type="button" class="btn btn-secondary par-tab-btn" data-tab="ai"
+                    style="font-size: 0.86rem; padding: 0.48rem 1rem; border-radius: 9999px;">
+                Family Guidance AI
+            </button>
+        </div>
+        <button type="button" class="btn btn-secondary par-tab-btn" data-tab="all"
+                style="font-size: 0.8rem; padding: 0.38rem 0.85rem; border-radius: 9999px; background: #FFFFFF;">
+            Show All
+        </button>
+    </div>
+
+    <!-- Student Identified Strengths (Strengths-First Focus) -->
+    <div class="par-tab-panel" data-panel="overview">
+    <div class="card" id="parent-summary-text" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title" style="color: #01463C;">
+            <span>What {{ student.name }} Does Best</span>
+            <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Celebrating Student Gifts</span>
+        </div>
+
+        <ul style="list-style-type: none; padding-left: 0; margin-bottom: 1.25rem;">
+            {% for str in explain.strengths %}
+            <li style="padding: 0.85rem 1.15rem; margin-bottom: 0.65rem; background: var(--bg-surface-alt); border-radius: 16px; border: 1.5px solid #01463C; font-size: 0.95rem; color: #01463C; display: flex; align-items: center; gap: 0.65rem;">
+                <span class="status-dot status-ontrack-dot"></span>
+                <span>{{ str }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div style="padding: 1.15rem 1.35rem; background: #E8F7F6; border-radius: 18px; border: 2px solid #01463C; font-size: 0.94rem; color: #01463C; line-height: 1.55;">
+            <strong>Educator Reflection:</strong> {{ explain.takeaway }}
+        </div>
+    </div>
+
+    <!-- Recent 30-Marks CBSE Assessment Scores -->
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">
+            <span>Recent 30-Marks CBSE Assessment Attempts</span>
+            <a href="{{ url_for('take_test_view') }}" class="btn btn-doorbell" style="font-size: 0.88rem; padding: 0.5rem 1.25rem;">
+                + Take Practice Test With Child
+            </a>
+        </div>
+
+        {% if test_attempts %}
+        <div class="table-responsive" style="border: 2px solid #01463C; border-radius: 20px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>MCQs (15M)</th>
+                        <th>Written (15M)</th>
+                        <th>Badge Awarded</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in test_attempts %}
+                    <tr>
+                        <td><strong>{{ a.subject }}</strong></td>
+                        <td><strong style="color: #01463C; font-size: 1.1rem;">{{ a.total_score }} / 30</strong> ({{ a.percentage }}%)</td>
+                        <td>{{ a.mcq_score }}/15</td>
+                        <td>{{ a.written_score }}/15</td>
+                        <td><span class="badge-support badge-ontrack">{{ a.badge }}</span></td>
+                        <td style="font-size: 0.82rem; color: var(--text-muted);">{{ a.created_at[:16] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 1.5rem; background: var(--bg-surface-alt); border-radius: 18px; border: 2px solid var(--border-color); text-align: center; color: var(--text-secondary); font-size: 0.95rem;">
+            No formal 30-marks assessments completed yet. Click <strong>"+ Take Practice Test With Child"</strong> above to choose a subject.
+        </div>
+        {% endif %}
+    </div>
+    </div>
+
+    <!-- Child's Evaluated Answer Sheet & Teacher Observed Remarks -->
+    <div class="par-tab-panel" data-panel="sheet">
+    <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">
+            <span>{{ student.name }}'s Evaluated Examination Answer Sheet</span>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                {% if answer_sheet %}
+                <a href="{{ url_for('view_answer_sheet', sheet_id=answer_sheet.id) }}" class="btn btn-doorbell" style="font-size: 0.88rem; padding: 0.5rem 1.25rem;">
+                    View Official CBSE Front Sheet (Q1-15)
+                </a>
+                {% endif %}
+                <a href="{{ url_for('student_portal') }}" class="btn btn-secondary" style="font-size: 0.88rem; padding: 0.5rem 1.25rem;">
+                    AI Logic & Practice Clinic &rarr;
+                </a>
+            </div>
+        </div>
+
+        {% if answer_sheet %}
+        <div style="background: var(--bg-surface-alt); padding: 1.5rem; border-radius: 20px; border: 2px solid #01463C; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+                <div>
+                    <h4 style="font-size: 1.2rem; font-weight: 800; color: #01463C; margin: 0;">
+                        {{ answer_sheet.subject }} &bull; {{ answer_sheet.exam_name }}
+                    </h4>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">
+                        Roll No: {{ answer_sheet.roll_no }} &bull; Medium: {{ answer_sheet.medium }} &bull; Examiner: {{ answer_sheet.examiner_name }}
+                    </span>
+                </div>
+                <div style="text-align: right; background: #FFFFFF; border: 2px solid #01463C; border-radius: 16px; padding: 0.5rem 1rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; text-transform: uppercase; font-weight: 700;">Total Marks Awarded</span>
+                    <strong style="font-size: 1.35rem; color: #DC2626;">{{ answer_sheet.total_marks_obtained }} / {{ answer_sheet.total_max_marks }}</strong>
+                </div>
+            </div>
+
+            <!-- Two Observation Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                <!-- Observed Weaknesses -->
+                <div style="background: #FEF2F2; border: 2px solid #DC2626; border-radius: 16px; padding: 1.2rem; box-shadow: 0 2px 0 #DC2626;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.45rem;">
+                        <span class="status-dot status-priority-dot"></span>
+                        <strong style="color: #991B1B; font-size: 0.95rem;">Teacher Observed Weaknesses & Learning Gaps:</strong>
+                    </div>
+                    <p style="font-size: 0.92rem; color: #7F1D1D; line-height: 1.55; margin: 0;">
+                        {{ answer_sheet.teacher_weaknesses or student.teacher_weaknesses or 'No specific weaknesses noted.' }}
+                    </p>
+                </div>
+
+                <!-- Observed Improvements -->
+                <div style="background: #ECFDF5; border: 2px solid #059669; border-radius: 16px; padding: 1.2rem; box-shadow: 0 2px 0 #059669;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.45rem;">
+                        <span class="status-dot status-ontrack-dot"></span>
+                        <strong style="color: #065F46; font-size: 0.95rem;">Teacher Observed Improvements & Growth:</strong>
+                    </div>
+                    <p style="font-size: 0.92rem; color: #064E3B; line-height: 1.55; margin: 0;">
+                        {{ answer_sheet.teacher_improvements or student.teacher_improvements or 'Consistent steady performance across sections.' }}
+                    </p>
+                </div>
+            </div>
+
+            {% if answer_sheet.teacher_general_remarks or student.teacher_remarks %}
+            <div style="margin-top: 1.25rem; padding: 1rem 1.25rem; background: #FFFFFF; border-radius: 16px; border: 2px solid #01463C; font-size: 0.92rem; color: #01463C;">
+                <strong>Teacher Home Advice:</strong> {{ answer_sheet.teacher_general_remarks or student.teacher_remarks }}
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="padding: 1.5rem; background: var(--bg-surface-alt); border-radius: 20px; border: 2px solid #01463C; text-align: center; color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.25rem;">
+            Teacher diagnostic observations on homework and term assessments:
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; text-align: left;">
+                <div style="background: #FEF2F2; padding: 1.15rem; border-radius: 16px; border: 2px solid #DC2626;">
+                    <strong style="color: #991B1B; font-size: 0.92rem;">Teacher Observed Weaknesses & Learning Gaps:</strong>
+                    <p style="font-size: 0.9rem; color: #7F1D1D; margin: 0.35rem 0 0; line-height: 1.5;">{{ student.teacher_weaknesses or 'Ongoing term evaluation in progress.' }}</p>
+                </div>
+                <div style="background: #ECFDF5; padding: 1.15rem; border-radius: 16px; border: 2px solid #059669;">
+                    <strong style="color: #065F46; font-size: 0.92rem;">Teacher Observed Improvements & Growth:</strong>
+                    <p style="font-size: 0.9rem; color: #064E3B; margin: 0.35rem 0 0; line-height: 1.5;">{{ student.teacher_improvements or 'Demonstrating positive learning engagement.' }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+
+    <!-- TEACHER-PARENT CONSULTATION & QUERY CHAT SECTION -->
+    <div class="par-tab-panel" data-panel="connect">
+    <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">
+            <span>Teacher-Parent Consultation & Query Center</span>
+            <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Direct message to {{ teacher_name }}</span>
+        </div>
+        <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.55;">
+            Have a question about {{ student.name }}'s reading pacing, homework adjustments, or multisensory materials? Submit a direct query below.
+        </p>
+
+        <!-- New Query Form -->
+        <form method="POST" action="{{ url_for('parent_send_query') }}" style="background: var(--bg-surface-alt); padding: 1.5rem; border-radius: 22px; border: 2px solid #01463C; margin-bottom: 1.75rem;">
+            <div style="margin-bottom: 1.15rem;">
+                <label for="query_subject" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                    Query Topic / Subject
+                </label>
+                <input type="text" id="query_subject" name="subject" required
+                       placeholder="e.g., Mathematics fraction practice, Reading tiredness, Visual aids..."
+                       style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 0.95rem;">
+            </div>
+
+            <div style="margin-bottom: 1.35rem;">
+                <label for="query_message" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                    Message / Question for Teacher
+                </label>
+                <textarea id="query_message" name="message" rows="3" required
+                          placeholder="Describe what you observed at home or what learning guidance you need..."
+                          style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 0.95rem;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-doorbell" style="padding: 0.75rem 2rem;">
+                Send Query to {{ teacher_name }}
+            </button>
+        </form>
+
+        <!-- Past Queries & Teacher Responses -->
+        <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem; color: #01463C;">
+            Consultation History & Teacher Replies ({{ messages|length }})
+        </h4>
+
+        {% if messages %}
+        <div style="display: flex; flex-direction: column; gap: 1.15rem;">
+            {% for m in messages %}
+            <div style="padding: 1.35rem; border-radius: 20px; border: 2px solid #01463C; background: #FFFFFF; box-shadow: 0 3px 0 #E2D3BE;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <strong style="font-size: 1.05rem; color: #01463C;">{{ m.subject }}</strong>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 0.15rem;">Sent on {{ m.created_at[:16] }}</span>
+                    </div>
+                    <span class="badge-support {% if m.status == 'Replied' %}badge-ontrack{% else %}badge-guided{% endif %}">
+                        {{ m.status }}
+                    </span>
+                </div>
+
+                <div style="font-size: 0.95rem; color: #01463C; margin-bottom: 0.85rem; padding: 0.85rem 1rem; background: var(--bg-surface-alt); border-radius: 14px; border: 1.5px solid var(--border-color);">
+                    <strong>Your Note:</strong> {{ m.message }}
+                </div>
+
+                {% if m.reply %}
+                <div style="padding: 1rem 1.25rem; background: #E8F7F6; border-radius: 14px; border: 2px solid #01463C; font-size: 0.95rem;">
+                    <div style="font-weight: 800; color: #01463C; font-size: 0.88rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                        <span class="status-dot status-ontrack-dot"></span>
+                        Response from {{ teacher_name }}:
+                    </div>
+                    <div style="color: #01463C; line-height: 1.55;">
+                        {{ m.reply }}
+                    </div>
+                </div>
+                {% else %}
+                <div style="font-size: 0.88rem; color: #92400E; font-style: italic; padding: 0.5rem 0.75rem; background: #FFFBEB; border-radius: 10px; border: 1px solid #FCD34D;">
+                    Pending educator review. The teacher typically replies within 24 hours.
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="font-size: 0.92rem; color: var(--text-muted); padding: 1.5rem; text-align: center; background: var(--bg-surface-alt); border-radius: 18px; border: 2px solid var(--border-color);">
+            No messages sent yet. Use the form above to reach out to {{ teacher_name }}.
+        </div>
+        {% endif %}
+    </div>
+    </div>
+
+    <!-- Supportive Home Practice Activities -->
+    <div class="par-tab-panel" data-panel="exercises">
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">
+            <span>Positive Home Support Activities</span>
+            <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Zero Pressure &bull; Fun Practice</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            {% for tip in plan.parent_tips %}
+            <div style="display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.9rem 1.15rem; background: var(--bg-surface-alt); border-radius: 16px; border: 1.5px solid var(--border-color);">
+                <span class="status-dot status-ontrack-dot" style="margin-top: 0.35rem;"></span>
+                <span style="font-size: 0.95rem; color: #01463C; line-height: 1.55;">{{ tip }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+<!-- CHILD LEARNING DISABILITY & EARLY SCREENING SUPPORT PROFILE -->
+<div class="card card-mint" id="ld-profile-parent" style="margin-top: 2rem; margin-bottom: 2rem; border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 5px 0 #01463C;">
+    <div class="card-title">
+        <div>
+            <span class="role-badge-tag" style="background: #1EACB0; color: #FFFFFF; margin-bottom: 0.35rem;">Inclusive Learning Care</span>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">
+                {{ student.name }}'s Learning Style &amp; Screening Profile
+            </h3>
+        </div>
+        <span class="badge-support {% if student.ld_screening_status == 'Confirmed Support Profile' %}badge-priority{% elif student.ld_screening_status == 'Possibility / Early Screening' %}badge-guided{% else %}badge-ontrack{% endif %}">
+            {{ student.ld_screening_status if student.ld_screening_status and student.ld_screening_status != 'None' else 'Standard Guided Support' }}
+        </span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #537D75; margin-bottom: 0.35rem;">
+                Primary Focus Area: {{ student.ld_category or 'General Pacing Support' }}
+            </div>
+            <p style="font-size: 0.94rem; color: #01463C; line-height: 1.6; margin: 0;">
+                {{ student.ld_notes or 'No learning barrier flags recorded. Everyday visual study habits and calm step pacing continue cleanly.' }}
+            </p>
+        </div>
+        <div style="background: #FDF7EF; border: 2px solid #01463C; border-radius: 18px; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: #01463C; margin-bottom: 0.35rem;">
+                What This Means (Plain &amp; Simple)
+            </div>
+            <p style="font-size: 0.92rem; color: #1F5F55; line-height: 1.6; margin: 0;">
+                A screening or support profile simply shows <strong>how your child learns best</strong>—such as reading one short line at a time, using visual maths boxes, and getting calm unhurried time instead of memorizing walls of text.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- COUNSELOR-UPDATED HOME EXERCISES & STUDY TECHNIQUES -->
+<div class="card" id="parent-exercises" style="margin-bottom: 2rem; border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 5px 0 #01463C;">
+    <div class="card-title">
+        <div>
+            <span class="role-badge-tag" style="background: #F3EEFF; color: #01463C; margin-bottom: 0.35rem;">Updated by School Counselor</span>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">
+                Latest 10-Minute Study Techniques &amp; Home Exercises
+            </h3>
+        </div>
+        <span style="font-size: 0.84rem; font-weight: 700; color: #537D75;">Synced Live with Counselor Portal</span>
+    </div>
+
+    <p style="font-size: 0.95rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.25rem;">
+        Whenever Dr. Meera Deshmukh adds or updates an exercise for your child's learning style, it appears right here with plain step-by-step instructions and a simple tip for home practice.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.25rem;">
+        {% for ex in counselor_exercises %}
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 20px; padding: 1.25rem; box-shadow: 0 3px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                        <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C;">{{ ex.study_technique }}</span>
+                        {% if ex.assigned_student_id == student.student_id %}
+                        <span class="role-badge-tag" style="background: #9B74FF; color: #01463C;">Assigned for {{ student.name }}</span>
+                        {% endif %}
+                    </div>
+                    <span style="font-size: 0.78rem; font-weight: 800; color: #537D75;">{{ ex.duration_mins }} mins &bull; <span id="practice-count-{{ ex.id }}">{{ ex.practice_count }}x practiced</span></span>
+                </div>
+                <h4 style="font-size: 1.12rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">{{ ex.title }}</h4>
+                <p style="font-size: 0.88rem; color: #1F5F55; margin-bottom: 0.65rem;"><strong>Goal:</strong> {{ ex.simple_goal }}</p>
+                <ol style="padding-left: 1.2rem; font-size: 0.86rem; color: #01463C; line-height: 1.5; margin-bottom: 0.75rem;">
+                    {% for st in ex.steps %}
+                    <li style="margin-bottom: 0.2rem;">{{ st }}</li>
+                    {% endfor %}
+                </ol>
+                <div style="background: #F8E7CD; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.65rem 0.85rem; font-size: 0.84rem; color: #01463C; margin-bottom: 0.65rem;">
+                    <strong>Parent Home Tip:</strong> {{ ex.home_tip }}
+                </div>
+                {% if ex.reference_url %}
+                <div style="background: #E8F7F6; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.6rem 0.85rem; font-size: 0.8rem; color: #01463C; margin-bottom: 0.75rem;">
+                    <div><strong>Taken as Reference From:</strong> {{ ex.reference_source_name }}</div>
+                    {% if ex.reference_summary %}<div style="color: #1F5F55; margin-top: 0.2rem;">{{ ex.reference_summary }}</div>{% endif %}
+                    <a href="{{ ex.reference_url }}" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-top: 0.3rem; color: #01463C; font-weight: 800; text-decoration: underline;">
+                        Read Independent Source Research &rarr;
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+                {% if ex.interactive_tool and ex.interactive_tool != 'none' %}
+                <button type="button" class="btn btn-doorbell launch-online-lab-btn"
+                        data-ex-id="{{ ex.id }}"
+                        data-tool="{{ ex.interactive_tool }}"
+                        data-title="{{ ex.title }}"
+                        data-goal="{{ ex.simple_goal }}"
+                        data-ref-name="{{ ex.reference_source_name or '' }}"
+                        data-ref-url="{{ ex.reference_url or '' }}"
+                        data-ext-name="{{ ex.external_site_name or '' }}"
+                        data-ext-url="{{ ex.external_practice_url or '' }}"
+                        style="width: 100%; font-size: 0.84rem; padding: 0.48rem;">
+                    Try Online Exercise Together Here
+                </button>
+                {% endif %}
+                <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                    {% if ex.external_practice_url %}
+                    <a href="{{ ex.external_practice_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="flex: 1; font-size: 0.8rem; padding: 0.42rem 0.7rem;">
+                        Open {{ ex.external_site_name or 'External App' }} &rarr;
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-secondary practice-log-btn" data-ex-id="{{ ex.id }}" style="flex: 1; font-size: 0.8rem; padding: 0.42rem 0.7rem;">
+                        Mark Practiced (+1)
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- INDEPENDENT RESEARCH LIBRARY & TRUSTED EXTERNAL PRACTICE SITES FOR PARENTS -->
+<div class="card card-sand" id="independent-research" style="margin-bottom: 2rem; border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 5px 0 #01463C;">
+    <div class="card-title">
+        <div>
+            <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; margin-bottom: 0.35rem;">Parent Independent Research</span>
+            <h3 style="font-size: 1.45rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">
+                Independent Websites &amp; Research References Used
+            </h3>
+        </div>
+        <span style="font-size: 0.82rem; font-weight: 700; color: #1F5F55;">Verified Non-Profit &amp; Academic Portals</span>
+    </div>
+    <p style="font-size: 0.94rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.25rem;">
+        Every Counselor study technique above is grounded in open educational research. Parents can open any reference website below directly in a new tab to read independent articles or try free interactive math tools at home.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+        {% for ref in research_references %}
+        <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.1rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; margin-bottom: 0.45rem;">{{ ref.category }}</span>
+                <h4 style="font-size: 1.02rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">{{ ref.name }}</h4>
+                <p style="font-size: 0.84rem; color: #1F5F55; line-height: 1.5; margin-bottom: 0.5rem;">
+                    <strong>Why Referenced:</strong> {{ ref.used_for }}
+                </p>
+                <p style="font-size: 0.82rem; color: #537D75; line-height: 1.45; margin-bottom: 0.85rem;">
+                    <strong>Explore on Site:</strong> {{ ref.what_parents_can_research }}
+                </p>
+            </div>
+            <a href="{{ ref.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.9rem;">
+                Visit Official Reference Website &rarr;
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% include "partials/online_exercise_lab.html" %}
+
+</div>
+
+<!-- HOW TO CONTACT SCHOOL COUNSELOR + DIRECT MESSAGE INBOX -->
+<div class="par-tab-panel" data-panel="connect">
+<div class="card card-sand" id="counselor-support" style="margin-bottom: 2rem; border: 2.5px solid #01463C; border-radius: 28px; box-shadow: 0 5px 0 #01463C;">
+    <div class="card-title">
+        <div>
+            <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; margin-bottom: 0.35rem;">Student - Parent - Teacher Care Circle</span>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #01463C; margin: 0.15rem 0 0;">
+                Connect With School Counselor (Dr. Meera Deshmukh)
+            </h3>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin-bottom: 1.35rem;">
+        <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.9rem;">
+            <strong style="color: #01463C; font-size: 0.9rem;">1. Parent Request</strong>
+            <p style="font-size: 0.84rem; color: #1F5F55; margin: 0.25rem 0 0;">Ask about reading pacing, dyslexia screening, CBSE exam accommodations, or book a 15-minute talk.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.9rem;">
+            <strong style="color: #01463C; font-size: 0.9rem;">2. Classroom &amp; Child Alignment</strong>
+            <p style="font-size: 0.84rem; color: #1F5F55; margin: 0.25rem 0 0;">Dr. Deshmukh aligns home routines with {{ student.name }}'s classroom teacher ({{ teacher_name }}).</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.9rem;">
+            <strong style="color: #01463C; font-size: 0.9rem;">3. Live Exercise Updates</strong>
+            <p style="font-size: 0.84rem; color: #1F5F55; margin: 0.25rem 0 0;">Fresh 10-minute home exercises appear directly above whenever updated by the Counselor.</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <form method="POST" action="{{ url_for('parent_send_counselor_message') }}" style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 20px; padding: 1.25rem;">
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.75rem;">Message or Request Counselor Session</h4>
+            <div style="margin-bottom: 0.65rem;">
+                <label for="par-req-type" style="display: block; font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Request Type</label>
+                <select id="par-req-type" name="request_type" style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 12px; border: 2px solid #01463C; font-family: inherit;">
+                    <option value="Appointment Request">Book a 15-Minute Counselor Talk</option>
+                    <option value="Query">Ask About Screening or CBSE Extra Time</option>
+                    <option value="Exercise Request">Request a Home Study Exercise</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 0.65rem;">
+                <label for="par-csub" style="display: block; font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Subject</label>
+                <input type="text" id="par-csub" name="subject" required placeholder="e.g., Reading confidence & extra-time check for Term 2"
+                       style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; font-family: inherit;">
+            </div>
+            <div style="margin-bottom: 0.85rem;">
+                <label for="par-cmsg" style="display: block; font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">Message to Dr. Meera Deshmukh</label>
+                <textarea id="par-cmsg" name="message" rows="3" required placeholder="Share what you notice during homework or any questions for the counselor..."
+                          style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; font-family: inherit;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-doorbell" style="width: 100%; padding: 0.65rem;">
+                Send to School Counselor
+            </button>
+        </form>
+
+        <div>
+            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.75rem;">Counselor Consultation History</h4>
+            <div style="display: grid; gap: 0.75rem;">
+                {% for cm in counselor_messages %}
+                <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 16px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; flex-wrap: wrap;">
+                        <span style="font-size: 0.82rem; font-weight: 800; color: #01463C;">[{{ cm.sender_role|title }}] {{ cm.subject }}</span>
+                        <span class="badge-support {% if cm.status == 'Replied' %}badge-ontrack{% else %}badge-guided{% endif %}">{{ cm.status }}</span>
+                    </div>
+                    <p style="font-size: 0.86rem; color: #1F5F55; margin: 0 0 0.5rem;">{{ cm.message }}</p>
+                    {% if cm.reply %}
+                    <div style="background: #E8F7F6; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.65rem 0.85rem; font-size: 0.88rem; color: #01463C;">
+                        <strong>Dr. Meera Deshmukh:</strong> {{ cm.reply }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div style="background: #FFFFFF; border: 1.5px dashed #01463C; border-radius: 16px; padding: 1rem; color: #537D75; font-size: 0.88rem;">
+                    No counselor messages yet. Send a quick inquiry or appointment request anytime.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- PARENT FAMILY GUIDANCE AI CHATBOT -->
+<div class="par-tab-panel" data-panel="ai">
+{% with chatbot_role='parent', chatbot_anchor_id='parent-ai-chatbot', chatbot_title='SEHAYAK Family Guidance AI', chatbot_subtitle='Ask any question in plain words about exam performance, learning support profiles, daily 10-minute home routines, CBSE support options, or contacting the School Counselor.' %}
+    {% include "partials/ai_chatbot.html" %}
+{% endwith %}
+</div>
+
+<!-- Close max-width 980px wrapper -->
+</div>
+
+<!-- Floating 1-Click Family AI Jump Button -->
+<button type="button" id="floating-parent-ai-jump" class="btn btn-doorbell"
+        style="position: fixed; bottom: 1.35rem; right: 1.35rem; z-index: 60; border-radius: 9999px; padding: 0.7rem 1.25rem; font-size: 0.88rem; box-shadow: 0 5px 0 #01463C;">
+    Ask Family AI
+</button>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const tabBtns = document.querySelectorAll(".par-tab-btn");
+    const tabPanels = document.querySelectorAll(".par-tab-panel");
+
+    function activateParentTab(tabKey) {
+        tabBtns.forEach(btn => btn.classList.toggle("active", btn.getAttribute("data-tab") === tabKey));
+        tabPanels.forEach(panel => {
+            const pKey = panel.getAttribute("data-panel");
+            panel.style.display = (tabKey === "all" || pKey === tabKey) ? "block" : "none";
+        });
+    }
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener("click", function() {
+            activateParentTab(btn.getAttribute("data-tab"));
+        });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    let initialTab = params.get("tab") || "exercises";
+    if (!params.get("tab")) {
+        if (hash === "#counselor-support") {
+            initialTab = "connect";
+        } else if (hash === "#parent-ai-chatbot") {
+            initialTab = "ai";
+        } else if (hash === "#ld-profile-parent" || hash === "#parent-exercises") {
+            initialTab = "exercises";
+        }
+    }
+    activateParentTab(initialTab);
+    if (hash) {
+        const el = document.querySelector(hash);
+        if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    }
+
+    const aiJump = document.getElementById("floating-parent-ai-jump");
+    if (aiJump) {
+        aiJump.addEventListener("click", function() {
+            activateParentTab("ai");
+            const bot = document.getElementById("parent-ai-chatbot");
+            if (bot) bot.scrollIntoView({ behavior: "smooth", block: "start" });
+            const chatInput = document.getElementById("chatbot-input-parent");
+            if (chatInput) setTimeout(() => chatInput.focus(), 250);
+        });
+    }
+});
+</script>
+{% endblock %}

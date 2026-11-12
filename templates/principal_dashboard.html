@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Principal Header (Leadership Command) -->
+<div class="card card-sand" style="border: 2.5px solid #01463C; border-radius: 28px; padding: 2.25rem 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 0 #01463C;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+        <div>
+            <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C; margin-bottom: 0.5rem;">
+                Institutional Leadership Portal
+            </span>
+            <h2 style="font-size: 1.95rem; font-weight: 800; margin-top: 0.5rem; margin-bottom: 0.4rem; color: #01463C; letter-spacing: -0.02em;">
+                School-Wide Academic Health & Capacity Building
+            </h2>
+            <p style="font-size: 1rem; color: #1F5F55; max-width: 750px; line-height: 1.55;">
+                Comprehensive oversight across all <strong>300 enrolled students</strong>, 3 educator cohorts, and remedial intervention efficacy.
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <span class="badge-support badge-guided" style="border-radius: 9999px;">Principal Executive View</span>
+        </div>
+    </div>
+</div>
+
+<!-- Strict Privacy Notice regarding Parent-Teacher Chats -->
+<div class="ethical-banner" style="border: 2px solid #01463C; background: #F8E7CD; box-shadow: 0 4px 0 #01463C; border-radius: 24px; padding: 1.25rem 1.75rem;" role="status">
+    <div>
+        <strong style="color: #01463C;">Confidentiality & Data Protection Protocol:</strong>
+        In adherence to Ministry of Education guidelines and school privacy policies, <strong>private parent-teacher consultation messages and queries are strictly confidential</strong> between the classroom teacher and the family. Administrative leadership oversees student trajectories, remedial roadmaps, and macro analytics without accessing private communication threads.
+    </div>
+</div>
+
+<!-- School-Wide High-Level KPIs -->
+<div class="kpi-grid">
+    <div class="kpi-card" style="border: 2px solid #01463C; border-radius: 24px; box-shadow: 0 4px 0 #01463C;">
+        <div class="kpi-title">Total School Enrollment</div>
+        <div class="kpi-value">{{ analytics.school_stats.total_students }}</div>
+        <div class="kpi-subtext">300 students across Classes 7, 8, 9</div>
+    </div>
+    <div class="kpi-card" style="border: 2px solid #01463C; border-radius: 24px; box-shadow: 0 4px 0 #01463C;">
+        <div class="kpi-title" style="color: #991B1B;">Priority Support Needed</div>
+        <div class="kpi-value" style="color: #DC2626;">{{ analytics.school_stats.high_risk_count }}</div>
+        <div class="kpi-subtext">School-wide urgent remedial cases</div>
+    </div>
+    <div class="kpi-card" style="border: 2px solid #01463C; border-radius: 24px; box-shadow: 0 4px 0 #01463C;">
+        <div class="kpi-title" style="color: #92400E;">Guided Support Needed</div>
+        <div class="kpi-value" style="color: #D97706;">{{ analytics.school_stats.moderate_risk_count }}</div>
+        <div class="kpi-subtext">Foundational review needed</div>
+    </div>
+    <div class="kpi-card" style="border: 2px solid #01463C; border-radius: 24px; box-shadow: 0 4px 0 #01463C;">
+        <div class="kpi-title" style="color: #065F46;">On-Track Mastery</div>
+        <div class="kpi-value" style="color: #059669;">{{ analytics.school_stats.on_track_count }}</div>
+        <div class="kpi-subtext">Satisfactory progression</div>
+    </div>
+    <div class="kpi-card" style="border: 2px solid #01463C; border-radius: 24px; box-shadow: 0 4px 0 #01463C;">
+        <div class="kpi-title">School Attendance Avg</div>
+        <div class="kpi-value">{{ analytics.school_stats.avg_attendance }}%</div>
+        <div class="kpi-subtext">Statutory benchmark &ge; 75%</div>
+    </div>
+</div>
+
+<!-- Comparative Educator Cohort Cards (100 Students Each) -->
+<div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+    <div class="card-title">
+        <span>Educator Cohort Performance & Capacity Overview (100 Students Each)</span>
+        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Teacher Distribution</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        {% for t in analytics.teacher_metrics %}
+        <div style="background: var(--bg-surface-alt); border: 2px solid #01463C; border-radius: 20px; padding: 1.5rem; box-shadow: 0 3px 0 #01463C;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h4 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.2rem;">
+                        {{ t.teacher_name }}
+                    </h4>
+                    <span style="font-size: 0.85rem; color: #1F5F55; font-weight: 700;">
+                        {{ t.grade }} Cohort ({{ t.total_students }} Students)
+                    </span>
+                </div>
+                <span class="badge-support badge-ontrack">{{ t.total_students }} Enrolled</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1rem; font-size: 0.88rem;">
+                <div style="background: #FFFFFF; padding: 0.65rem; border-radius: 12px; border: 1.5px solid #01463C; text-align: center;">
+                    <span style="color: var(--text-muted); display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Priority Support</span>
+                    <strong style="color: #DC2626; font-size: 1.25rem; font-weight: 800;">{{ t.high_risk_count }}</strong>
+                </div>
+                <div style="background: #FFFFFF; padding: 0.65rem; border-radius: 12px; border: 1.5px solid #01463C; text-align: center;">
+                    <span style="color: var(--text-muted); display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Guided Support</span>
+                    <strong style="color: #D97706; font-size: 1.25rem; font-weight: 800;">{{ t.moderate_risk_count }}</strong>
+                </div>
+                <div style="background: #FFFFFF; padding: 0.65rem; border-radius: 12px; border: 1.5px solid #01463C; text-align: center;">
+                    <span style="color: var(--text-muted); display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Attendance</span>
+                    <strong style="font-size: 1.25rem; color: #01463C; font-weight: 800;">{{ t.avg_attendance }}%</strong>
+                </div>
+                <div style="background: #FFFFFF; padding: 0.65rem; border-radius: 12px; border: 1.5px solid #01463C; text-align: center;">
+                    <span style="color: var(--text-muted); display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Average Score</span>
+                    <strong style="font-size: 1.25rem; color: #01463C; font-weight: 800;">{{ t.avg_score }}%</strong>
+                </div>
+            </div>
+
+            <a href="{{ url_for('dashboard', teacher=t.teacher_id) }}" class="btn btn-secondary" style="width: 100%; font-size: 0.88rem; padding: 0.55rem;">
+                View {{ t.grade }} Student Roster &rarr;
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- School-Wide 4-Quadrant Diagnostic Map -->
+<div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+    <div class="card-title">
+        <span>Institutional 4-Quadrant Diagnostic Distribution (All 300 Students)</span>
+        <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Macro Educational Vulnerability Map</span>
+    </div>
+    <div id="quadrant-scatter-chart"></div>
+</div>
+
+<!-- Full School Student Directory -->
+<div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+    <div class="card-title">
+        <span>All 300 Enrolled Students Directory</span>
+        <a href="{{ url_for('export_students_csv', risk='ALL') }}" class="btn btn-secondary" style="font-size: 0.88rem; padding: 0.45rem 1.15rem;">
+            Export Full 300 Students CSV
+        </a>
+    </div>
+
+    <div class="table-responsive" style="border: 2px solid #01463C; border-radius: 20px;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Grade</th>
+                    <th>Assigned Teacher</th>
+                    <th>Attendance</th>
+                    <th>Overall Marks</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in all_students[:50] %}
+                <tr>
+                    <td style="font-family: monospace; font-weight: 700; color: #01463C;">{{ s.student_id }}</td>
+                    <td style="font-weight: 700;">{{ s.name }}</td>
+                    <td>Class {{ s.grade }}-{{ s.section }}</td>
+                    <td>
+                        {% if s.teacher_id == 'teacher1' %}Mrs. Ananya Sharma
+                        {% elif s.teacher_id == 'teacher2' %}Mr. Vikram Iyer
+                        {% else %}Ms. Pooja Verma{% endif %}
+                    </td>
+                    <td>{{ "%.1f"|format(s.attendance_rate) }}%</td>
+                    <td><strong>{{ "%.1f"|format(s.overall_avg) }}%</strong></td>
+                    <td>
+                        {% if s.risk_level == 'HIGH' %}
+                            <span class="badge-support badge-priority"><span class="status-dot status-priority-dot"></span> Priority</span>
+                        {% elif s.risk_level == 'MODERATE' %}
+                            <span class="badge-support badge-guided"><span class="status-dot status-guided-dot"></span> Guided</span>
+                        {% else %}
+                            <span class="badge-support badge-ontrack"><span class="status-dot status-ontrack-dot"></span> On-Track</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('student_detail', student_id=s.student_id) }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;">
+                            Diagnostic
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if all_students|length > 50 %}
+        <div style="text-align: center; padding: 1.25rem; color: var(--text-muted); font-size: 0.88rem; background: var(--bg-surface-alt); border-top: 1px solid var(--border-color);">
+            Showing first 50 records of {{ all_students|length }}. Use CSV export for full school archival records.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const studentsData = [
+        {% for s in all_students %}
+        {
+            student_id: "{{ s.student_id }}",
+            name: "{{ s.name }}",
+            attendance_rate: {{ s.attendance_rate }},
+            overall_avg: {{ s.overall_avg }},
+            risk_level: "{{ s.risk_level }}",
+            archetype: "{{ s.archetype }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    renderQuadrantScatter(studentsData);
+});
+</script>
+{% endblock %}

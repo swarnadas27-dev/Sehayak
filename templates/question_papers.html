@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1050px; margin: 1rem auto;">
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+        <div>
+            <h2 style="font-size: 1.85rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem; letter-spacing: -0.02em;">
+                Curriculum Question Papers Repository
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Official examination question papers, question sequence mapping, and maximum marks rubrics.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <a href="{{ url_for('answer_sheets_list') }}" class="btn btn-secondary">
+                View Answer Sheets
+            </a>
+            <button onclick="document.getElementById('upload-paper-card').scrollIntoView({behavior: 'smooth'})" class="btn btn-doorbell">
+                + Upload New Question Paper
+            </button>
+        </div>
+    </div>
+
+    <!-- Active Question Papers List -->
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">
+            <span>Available Question Papers ({{ papers|length }})</span>
+            <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Standardized 15-Question Sequence (50 Marks)</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% for p in papers %}
+            <div style="padding: 1.5rem; background: var(--bg-surface-alt); border-radius: 20px; border: 2px solid #01463C; box-shadow: 0 3px 0 #01463C;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div>
+                        <span class="role-badge-tag" style="background: #FFFFFF; color: #01463C; border: 1.5px solid #01463C; margin-bottom: 0.35rem;">
+                            {{ p.grade }} &bull; {{ p.subject }}
+                        </span>
+                        <h3 style="font-size: 1.35rem; font-weight: 800; margin-top: 0.35rem; color: #01463C; letter-spacing: -0.01em;">
+                            {{ p.title }}
+                        </h3>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                            Exam: <strong>{{ p.exam_name }}</strong> &bull; Total Marks: <strong>{{ p.total_marks }}</strong> &bull; Questions: <strong>{{ p.total_questions }}</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{{ url_for('upload_answer_sheet_view') }}" class="btn btn-doorbell" style="padding: 0.45rem 1.15rem; font-size: 0.85rem;">
+                            Grade Answer Sheets &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sequence Rubric Expander -->
+                <details style="font-size: 0.9rem; color: var(--text-secondary);">
+                    <summary style="cursor: pointer; font-weight: 700; color: #01463C;">
+                        View Question Sequence & Max Marks Rubric (1 to {{ p.total_questions }})
+                    </summary>
+                    <div style="margin-top: 1rem; background: #FFFFFF; padding: 1.15rem; border-radius: 16px; border: 2px solid #01463C;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 0.5rem; text-align: center;">
+                            {% for q_item in p.questions_sequence %}
+                            <div style="padding: 0.5rem; background: var(--bg-surface-alt); border-radius: 10px; border: 1.5px solid #01463C; font-size: 0.85rem;">
+                                <div style="font-weight: 800; color: #01463C;">Q{{ q_item.q }}</div>
+                                <div style="color: #059669; font-weight: 800; font-size: 0.82rem;">{{ q_item.max }}M</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </details>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Upload Question Paper Form Card -->
+    <div class="card" id="upload-paper-card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">Upload / Register a Question Paper</div>
+        <form method="POST" action="{{ url_for('question_papers_view') }}" enctype="multipart/form-data">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                <div>
+                    <label for="paper_title" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Question Paper Title *
+                    </label>
+                    <input type="text" id="paper_title" name="title" required placeholder="e.g. Annual Exam 2026-27 - Social Science"
+                           style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                </div>
+
+                <div>
+                    <label for="paper_subject" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Subject *
+                    </label>
+                    <select id="paper_subject" name="subject" required style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                        <option value="Social Science">Social Science</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="paper_grade" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Target Grade Cohort *
+                    </label>
+                    <select id="paper_grade" name="grade" required style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                        <option value="Class 7">Class 7</option>
+                        <option value="Class 8">Class 8</option>
+                        <option value="Class 9">Class 9</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="paper_exam" style="display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.4rem; color: #01463C;">
+                        Examination Session *
+                    </label>
+                    <input type="text" id="paper_exam" name="exam_name" value="Annual Examination (Session 2026-2027)" required
+                           style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; font-size: 0.92rem;">
+                </div>
+            </div>
+
+            <div style="padding: 1.25rem; background: var(--bg-surface-alt); border-radius: 18px; border: 2px dashed #01463C; margin-bottom: 1.5rem;">
+                <label for="paper_file" style="display: block; font-weight: 800; font-size: 0.92rem; margin-bottom: 0.35rem; color: #01463C;">
+                    Upload Question Paper Document / PDF (Optional)
+                </label>
+                <input type="file" id="paper_file" name="paper_file" accept=".pdf,.doc,.docx,image/*" style="font-size: 0.9rem;">
+            </div>
+
+            <button type="submit" class="btn btn-doorbell" style="padding: 0.75rem 2.25rem; font-size: 1rem;">
+                Register Question Paper & Sequence
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

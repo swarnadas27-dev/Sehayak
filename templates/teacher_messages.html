@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 1rem auto;">
+    <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+        <div>
+            <a href="{{ url_for('dashboard') }}" style="font-size: 0.92rem; color: #01463C; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+                &larr; Back to Class Dashboard
+            </a>
+            <h2 style="font-size: 1.85rem; font-weight: 800; color: #01463C; margin-top: 0.2rem; letter-spacing: -0.02em;">
+                Parent Queries & Communication Center
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                Direct, confidential dialogue between educators and parents for student support.
+            </p>
+        </div>
+
+        <span class="badge-support badge-guided">
+            {{ messages|length }} Total Queries
+        </span>
+    </div>
+
+    <!-- Communication Threads -->
+    {% if messages %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for m in messages %}
+        <div class="card" style="border: 2px solid #01463C; border-radius: 24px; box-shadow: 0 4px 0 #01463C; padding: 1.75rem;">
+            <!-- Thread Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                    <span class="role-badge-tag" style="background: var(--bg-surface-alt); color: #01463C; margin-bottom: 0.4rem;">
+                        Student: {{ m.student_name }} ({{ m.student_id }}) &bull; Class {{ m.grade }}-{{ m.section }}
+                    </span>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; margin-top: 0.25rem; color: #01463C;">
+                        {{ m.subject }}
+                    </h3>
+                    <div style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                        From: <strong>{{ m.sender_name }}</strong> &bull; Date: {{ m.created_at[:16] }}
+                    </div>
+                </div>
+
+                <span class="badge-support {% if m.status == 'Replied' %}badge-ontrack{% else %}badge-guided{% endif %}">
+                    {{ m.status }}
+                </span>
+            </div>
+
+            <!-- Parent Message Body -->
+            <div style="padding: 1.15rem 1.35rem; background: var(--bg-surface-alt); border-radius: 16px; border: 1.5px solid var(--border-color); margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.55; color: #01463C;">
+                <strong style="display: block; margin-bottom: 0.25rem; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted);">Parent Inquiry:</strong>
+                {{ m.message }}
+            </div>
+
+            <!-- Existing Teacher Reply -->
+            {% if m.reply %}
+            <div style="padding: 1.15rem 1.35rem; background: #E8F7F6; border-radius: 16px; border: 2px solid #01463C; margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.55;">
+                <div style="font-size: 0.85rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <span class="status-dot status-ontrack-dot"></span>
+                    Your Educator Response:
+                </div>
+                <div style="color: #01463C;">
+                    {{ m.reply }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reply Form -->
+            <form method="POST" action="{{ url_for('teacher_reply_message') }}" style="background: var(--bg-surface); padding: 1.25rem; border-radius: 18px; border: 1.5px solid var(--border-color);">
+                <input type="hidden" name="message_id" value="{{ m.id }}">
+                <div style="margin-bottom: 1rem;">
+                    <label for="reply-{{ m.id }}" style="font-size: 0.88rem; font-weight: 700; display: block; margin-bottom: 0.4rem; color: #01463C;">
+                        {% if m.reply %}Update / Send Follow-Up Message:{% else %}Write Response to Parent:{% endif %}
+                    </label>
+                    <textarea id="reply-{{ m.id }}" name="reply_text" rows="2" required
+                              placeholder="Write a warm, actionable response or recommend home multisensory steps..."
+                              style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-size: 0.95rem; font-family: inherit;"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-doorbell" style="padding: 0.65rem 1.75rem; font-size: 0.92rem;">
+                        Send Response
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card card-sand" style="text-align: center; padding: 3.5rem 2rem; border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="status-pill status-pill-ontrack" style="margin: 0 auto 1rem; width: fit-content; font-size: 0.88rem; padding: 0.45rem 1.25rem;">
+            <span class="status-dot status-ontrack-dot"></span> Inbox Clean
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.35rem; color: #01463C;">No Pending Parent Queries</h3>
+        <p style="font-size: 0.92rem; color: #1F5F55;">
+            All parent communications for your student cohort are currently up to date!
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

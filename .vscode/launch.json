@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: SEHAYAK Web App",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/app.py",
+      "console": "integratedTerminal",
+      "env": {
+        "FLASK_ENV": "development",
+        "FLASK_DEBUG": "1"
+      }
+    },
+    {
+      "name": "Python: Generate Synthetic Dataset (250 Students)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/utils/data_generator.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: Train Risk Models",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/models/risk_model.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: Run Unit Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "unittest",
+      "args": ["discover", "-s", "tests"],
+      "console": "integratedTerminal"
+    }
+  ]
+}

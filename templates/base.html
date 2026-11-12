@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="{{ lang|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('app_title') }} - {{ title|default('Slow Learner Support & Remedial System') }}</title>
+    
+    <!-- Dyslexia & Inclusivity Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/accessibility.css') }}">
+    <!-- Main Application Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    <!-- Plotly.js CDN for Accessible Visualizations -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="font-visdeurbel theme-soft-cream">
+
+    <div id="color-tint-overlay" aria-hidden="true"></div>
+    <div id="dyslexia-reading-ruler" aria-hidden="true"></div>
+
+    <div class="app-container">
+        <!-- Accessible Navigation Bar (Floating Pill Navbar) -->
+        <header class="navbar-wrapper">
+            <nav class="navbar" aria-label="Main Navigation">
+                <div class="nav-brand">
+                    <span class="brand-logo-mark" aria-hidden="true">S</span>
+                    <div class="brand-text">
+                        <h1>
+                            <a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">
+                                {{ t('app_title') }}
+                            </a>
+                            <span class="brand-badge" title="Active Monitoring System"><span class="live-dot" aria-hidden="true"></span> PSB152</span>
+                        </h1>
+                    </div>
+                </div>
+
+                <ul class="nav-menu">
+                    <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+                    {% if session.get('user', {}).get('role') == 'principal' %}
+                        <li><a href="{{ url_for('principal_dashboard') }}" class="nav-link {% if request.endpoint == 'principal_dashboard' %}active{% endif %}">Principal Dashboard</a></li>
+                        <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">All Students</a></li>
+                    {% elif session.get('user', {}).get('role') == 'counselor' %}
+                        <li><a href="{{ url_for('counselor_dashboard') }}" class="nav-link {% if request.endpoint == 'counselor_dashboard' %}active{% endif %}">Counselor Workspace</a></li>
+                        <li><a href="{{ url_for('counselor_dashboard') }}#ld-roster" class="nav-link">LD Support Roster</a></li>
+                        <li><a href="{{ url_for('counselor_dashboard') }}#counselor-inbox" class="nav-link">Support Inbox</a></li>
+                        <li><a href="{{ url_for('counselor_dashboard') }}#exercise-publisher" class="nav-link">Study Exercises</a></li>
+                    {% elif session.get('user', {}).get('role') == 'teacher' %}
+                        <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">My 100 Students</a></li>
+                        <li><a href="{{ url_for('answer_sheets_list') }}" class="nav-link {% if request.endpoint in ['answer_sheets_list', 'upload_answer_sheet_view', 'view_answer_sheet'] %}active{% endif %}">Answer Sheets</a></li>
+                        <li><a href="{{ url_for('question_papers_view') }}" class="nav-link {% if request.endpoint == 'question_papers_view' %}active{% endif %}">Question Papers</a></li>
+                        <li><a href="{{ url_for('teacher_messages_view') }}" class="nav-link {% if request.endpoint == 'teacher_messages_view' %}active{% endif %}">Parent Queries</a></li>
+                        <li><a href="{{ url_for('upload_data') }}" class="nav-link {% if request.endpoint == 'upload_data' %}active{% endif %}">{{ t('nav_upload') }}</a></li>
+                    {% elif session.get('user', {}).get('role') == 'parent' %}
+                        <li><a href="{{ url_for('parent_view') }}" class="nav-link {% if request.endpoint == 'parent_view' %}active{% endif %}">Parent Portal</a></li>
+                        <li><a href="{{ url_for('take_test_view') }}" class="nav-link">30-Marks Tests</a></li>
+                    {% elif session.get('user', {}).get('role') == 'student' %}
+                        <li><a href="{{ url_for('student_portal') }}" class="nav-link {% if request.endpoint == 'student_portal' %}active{% endif %}">{{ t('nav_practice') }}</a></li>
+                        <li><a href="{{ url_for('take_test_view') }}" class="nav-link {% if request.endpoint == 'take_test_view' %}active{% endif %}">Take 30-Marks Test</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}" class="nav-link">Sign In</a></li>
+                    {% endif %}
+                </ul>
+
+                <div class="nav-controls">
+                    <!-- Language Switcher -->
+                    <a href="{{ url_for('switch_language', lang='hi' if lang == 'en' else 'en') }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;" title="Switch Language">
+                        {{ "हिन्दी" if lang == "en" else "English" }}
+                    </a>
+
+                    <!-- Accessibility Panel Toggle -->
+                    <button id="a11y-toggle-btn" class="a11y-toolbar-toggle" aria-expanded="false" aria-controls="a11y-drawer-panel" title="{{ t('accessibility_title') }}">
+                        <span>{{ t('accessibility_title') }}</span>
+                    </button>
+
+                    <!-- Auth Actions -->
+                    {% if session.get('user') %}
+                        <span style="font-size: 0.86rem; color: #01463C; margin-left: 0.5rem; font-weight: 800;">
+                            {{ session['user']['full_name'] }}
+                        </span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.82rem;">{{ t('nav_logout') }}</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 0.35rem 0.95rem; font-size: 0.85rem;">{{ t('nav_login') }}</a>
+                    {% endif %}
+                </div>
+            </nav>
+        </header>
+
+        <!-- Dyslexia & Accessibility Control Drawer -->
+        <aside id="a11y-drawer-panel" class="a11y-panel" aria-label="Accessibility Settings">
+            <div class="a11y-header">
+                <h3 style="font-size: 1.05rem; font-weight: 700;">{{ t('accessibility_title') }}</h3>
+                <button id="a11y-close-btn" class="btn btn-secondary" style="padding: 0.15rem 0.45rem; font-size: 0.8rem;" aria-label="Close settings">&times;</button>
+            </div>
+
+            <!-- Reading Guide / Ruler Tool -->
+            <div class="a11y-section">
+                <label>Dyslexia Reading Tools</label>
+                <button id="ruler-toggle-btn" class="btn btn-secondary" style="width: 100%; font-size: 0.85rem; margin-bottom: 0.4rem; justify-content: flex-start;">
+                    Toggle Reading Ruler (Line Guide)
+                </button>
+            </div>
+
+            <!-- Irlen Color Overlay Tints -->
+            <div class="a11y-section">
+                <label id="lbl-tint">Color Tint Overlay (Glare Reduction)</label>
+                <div class="btn-group-toggle" role="group" aria-labelledby="lbl-tint">
+                    <button class="btn-toggle-option" data-tint-option="tint-none">None</button>
+                    <button class="btn-toggle-option" data-tint-option="tint-rose">Rose</button>
+                    <button class="btn-toggle-option" data-tint-option="tint-aqua">Aqua</button>
+                    <button class="btn-toggle-option" data-tint-option="tint-yellow">Yellow</button>
+                    <button class="btn-toggle-option" data-tint-option="tint-lavender">Lavender</button>
+                </div>
+            </div>
+
+            <!-- Typography Choice -->
+            <div class="a11y-section">
+                <label id="lbl-font">Reading Typography</label>
+                <div class="btn-group-toggle" role="group" aria-labelledby="lbl-font">
+                    <button class="btn-toggle-option" data-font-option="font-lexend">Lexend</button>
+                    <button class="btn-toggle-option" data-font-option="font-opendyslexic">OpenDyslexic</button>
+                    <button class="btn-toggle-option" data-font-option="font-sans">Standard</button>
+                </div>
+            </div>
+
+            <!-- Theme / Color Contrast -->
+            <div class="a11y-section">
+                <label id="lbl-theme">Contrast & Color Theme</label>
+                <div class="btn-group-toggle" role="group" aria-labelledby="lbl-theme">
+                    <button class="btn-toggle-option" data-theme-option="theme-soft-cream">Soft Cream</button>
+                    <button class="btn-toggle-option" data-theme-option="theme-pastel-yellow">Ochre</button>
+                    <button class="btn-toggle-option" data-theme-option="theme-pastel-blue">Sky</button>
+                    <button class="btn-toggle-option" data-theme-option="theme-high-contrast">High Contrast</button>
+                    <button class="btn-toggle-option" data-theme-option="theme-clean-white">White</button>
+                </div>
+            </div>
+
+            <!-- Font Size Slider -->
+            <div class="a11y-section">
+                <label for="font-size-slider">{{ t('font_size_label') }}: <span id="font-size-val">16px</span></label>
+                <div class="slider-wrapper">
+                    <span style="font-size: 0.8rem;">A</span>
+                    <input type="range" id="font-size-slider" min="14" max="24" step="1" value="16">
+                    <span style="font-size: 1.2rem; font-weight: 700;">A</span>
+                </div>
+            </div>
+
+            <!-- Line Height Slider -->
+            <div class="a11y-section">
+                <label for="line-spacing-slider">{{ t('line_spacing_label') }}: <span id="line-spacing-val">1.65x</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="line-spacing-slider" min="1.4" max="2.2" step="0.05" value="1.65">
+                </div>
+            </div>
+
+            <!-- Letter Spacing Slider -->
+            <div class="a11y-section">
+                <label for="letter-spacing-slider">{{ t('letter_spacing_label') }}: <span id="letter-spacing-val">0.04em</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="letter-spacing-slider" min="0" max="0.16" step="0.02" value="0.04">
+                </div>
+            </div>
+
+            <!-- Speech Rate Slider -->
+            <div class="a11y-section">
+                <label for="tts-rate-slider">Voice Reading Pace: <span id="tts-rate-val">0.90x</span></label>
+                <div class="slider-wrapper">
+                    <input type="range" id="tts-rate-slider" min="0.70" max="1.30" step="0.05" value="0.90">
+                </div>
+            </div>
+
+            <button id="a11y-reset-btn" class="btn btn-secondary" style="width: 100%; font-size: 0.82rem; margin-top: 0.5rem;">
+                Reset to Recommended Defaults
+            </button>
+        </aside>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div style="max-width: 1400px; margin: 1rem auto 0; padding: 0 2.5rem; width: 100%;">
+                    {% for category, message in messages %}
+                        <div class="card" style="padding: 0.85rem 1.25rem; margin-bottom: 0.75rem; border-left: 5px solid {% if category == 'danger' %}#DC2626{% elif category == 'success' %}#059669{% else %}#D97706{% endif %};">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content Block -->
+        <main class="main-content" id="main-content-region">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer & Ethical Statement -->
+        <footer class="footer">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <p style="margin-bottom: 0.35rem; font-weight: 600;">
+                    SEHAYAK (सहायक) - Ministry of Education Problem Statement #PSB152
+                </p>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">
+                    {{ t('disclaimer_text') }}
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/accessibility.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tts_engine.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard_charts.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section style="padding: 2.75rem 0 2rem; text-align: center;">
+    <!-- Live Ecosystem Pill Badge -->
+    <div style="display: inline-flex; align-items: center; gap: 0.65rem; background: #F8E7CD; border: 2px solid #01463C; padding: 0.45rem 1.35rem; border-radius: 9999px; font-size: 0.86rem; font-weight: 800; color: #01463C; margin-bottom: 1.5rem; box-shadow: 0 3px 0 #01463C;">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span>LIVE &bull; Ministry of Education &bull; Problem Statement #PSB152</span>
+        <span style="color: #94A3B8;">|</span>
+        <span>NEP 2020 & RPwD Act 2016 Compliant</span>
+    </div>
+
+    <!-- Main Title & Welcoming Tagline in Bricolage Grotesque -->
+    <h1 style="font-size: 3.2rem; font-weight: 800; color: #01463C; line-height: 1.12; margin-bottom: 1rem; max-width: 980px; margin-left: auto; margin-right: auto; letter-spacing: -0.03em;">
+        SEHAYAK &bull; सहायक
+        <span style="display: block; font-size: 1.55rem; font-weight: 700; color: #1F5F55; margin-top: 0.5rem; letter-spacing: -0.01em;">
+            Slow Learner Identification & Remedial Support System
+        </span>
+    </h1>
+
+    <p style="font-size: 1.12rem; color: #1F5F55; max-width: 840px; margin: 0 auto 2.5rem; line-height: 1.65;">
+        <strong>SEHAYAK</strong> is an early identification and remedial learning platform designed to support every student at their own pace. The system evaluates assessment performance, attendance health, and examination answer sheets to identify learning gaps early—generating strengths-based remedial pathways, multisensory CBSE practice, and seamless collaboration between teachers, parents, students, and school leadership.
+    </p>
+
+    <!-- 4 STAKEHOLDER CONSOLES -->
+    <div class="card" style="border-radius: 32px; padding: 2.5rem; max-width: 1160px; margin: 0 auto 3rem; background: #FFFFFF; border: 3px solid #01463C; box-shadow: 0 8px 0 #01463C, 0 25px 50px -10px rgba(1,70,60,0.15);">
+        {% if session.get('user') %}
+        <div style="background: #F8E7CD; border: 2.5px solid #01463C; border-radius: 20px; padding: 1rem 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; text-align: left; box-shadow: 0 4px 0 #01463C;">
+            <div style="font-size: 1rem; font-weight: 700; color: #01463C;">
+                Signed in as <strong>{{ session['user']['full_name'] }}</strong> ({{ session['user']['role'].title() }})
+            </div>
+            <a href="{{ url_for('principal_dashboard' if session['user']['role'] == 'principal' else ('dashboard' if session['user']['role'] == 'teacher' else ('parent_view' if session['user']['role'] == 'parent' else 'student_portal'))) }}" class="btn btn-doorbell" style="padding: 0.5rem 1.25rem; font-size: 0.9rem;">
+                Go to My Dashboard &rarr;
+            </a>
+        </div>
+        {% endif %}
+
+        <div style="text-align: center; margin-bottom: 1.75rem;">
+            <span style="display: inline-block; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: #01463C; letter-spacing: 0.08em; background: #F8E7CD; padding: 0.4rem 1.25rem; border-radius: 9999px; border: 2px solid #01463C; box-shadow: 0 2px 0 #01463C;">
+                Select Your Role to Access Workspace
+            </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 1.5rem; text-align: left;">
+            <!-- Teacher Console -->
+            <div style="background: #E8F7F6; border: 2.5px solid #01463C; border-radius: 26px; padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 5px 0 #01463C;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                        <span class="role-badge-tag" style="background: #1EACB0; color: #01463C;">Educator</span>
+                        <span style="font-size: 0.78rem; font-weight: 800; color: #01463C;">100 Students</span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                        Teacher Workspace
+                    </h3>
+                    <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin-bottom: 1.25rem;">
+                        4-Quadrant diagnostics, 15-question front covers, qualitative remarks & RTI tracker.
+                    </p>
+                </div>
+                <a href="{{ url_for('login', role='teacher') }}" class="btn btn-teacher" style="width: 100%; font-size: 0.94rem; padding: 0.7rem 1rem;">
+                    Login as Teacher
+                </a>
+            </div>
+
+            <!-- Student Hub -->
+            <div style="background: #F3EEFF; border: 2.5px solid #01463C; border-radius: 26px; padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 5px 0 #01463C;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                        <span class="role-badge-tag" style="background: #9B74FF; color: #01463C;">Learner</span>
+                        <span style="font-size: 0.78rem; font-weight: 800; color: #01463C;">30-Mark Tests</span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                        Student Portal
+                    </h3>
+                    <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin-bottom: 1.25rem;">
+                        CBSE 30M practice, speech dictation, dyslexia reading ruler & color overlays.
+                    </p>
+                </div>
+                <a href="{{ url_for('login', role='student') }}" class="btn btn-student" style="width: 100%; font-size: 0.94rem; padding: 0.7rem 1rem;">
+                    Login as Student
+                </a>
+            </div>
+
+            <!-- Parent Corner -->
+            <div style="background: #FFF7E6; border: 2.5px solid #01463C; border-radius: 26px; padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 5px 0 #01463C;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                        <span class="role-badge-tag" style="background: #F0AF00; color: #01463C;">Family</span>
+                        <span style="font-size: 0.78rem; font-weight: 800; color: #01463C;">Progress & Chat</span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                        Parent Portal
+                    </h3>
+                    <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin-bottom: 1.25rem;">
+                        Child growth trajectory, celebration of gifts & direct confidential teacher chat.
+                    </p>
+                </div>
+                <a href="{{ url_for('login', role='parent') }}" class="btn btn-parent" style="width: 100%; font-size: 0.94rem; padding: 0.7rem 1rem;">
+                    Login as Parent
+                </a>
+            </div>
+
+            <!-- School Counselor Hub -->
+            <div style="background: #E8F7F6; border: 2.5px solid #01463C; border-radius: 26px; padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 5px 0 #01463C;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                        <span class="role-badge-tag" style="background: #1EACB0; color: #FFFFFF;">Counselor</span>
+                        <span style="font-size: 0.78rem; font-weight: 800; color: #01463C;">LD & Study Support</span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                        School Counselor
+                    </h3>
+                    <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin-bottom: 1.25rem;">
+                        Sectioned learning disability screening roster, multi-role inbox & simple study exercises.
+                    </p>
+                </div>
+                <a href="{{ url_for('login', role='counselor') }}" class="btn btn-doorbell" style="width: 100%; font-size: 0.94rem; padding: 0.7rem 1rem;">
+                    Login as Counselor
+                </a>
+            </div>
+
+            <!-- Principal Leadership -->
+            <div style="background: #F8E7CD; border: 2.5px solid #01463C; border-radius: 26px; padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 5px 0 #01463C;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+                        <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF;">Leadership</span>
+                        <span style="font-size: 0.78rem; font-weight: 800; color: #01463C;">300 Students</span>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">
+                        Principal Post
+                    </h3>
+                    <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin-bottom: 1.25rem;">
+                        School-wide macro oversight, 3-teacher roster balance & privacy firewall.
+                    </p>
+                </div>
+                <a href="{{ url_for('login', role='principal') }}" class="btn btn-principal" style="width: 100%; font-size: 0.94rem; padding: 0.7rem 1rem;">
+                    Login as Principal
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- HOW SEHAYAK SERVES EACH DEMOGRAPHIC SECTION -->
+<section style="margin-bottom: 3.5rem;">
+    <div style="text-align: center; margin-bottom: 2.25rem;">
+        <span style="font-size: 0.82rem; font-weight: 800; text-transform: uppercase; color: #01463C; letter-spacing: 0.08em; background: #F8E7CD; padding: 0.4rem 1.15rem; border-radius: 9999px; border: 2px solid #01463C; box-shadow: 0 2px 0 #01463C;">
+            Inclusive Stakeholder Ecosystem
+        </span>
+        <h2 style="font-size: 2.2rem; font-weight: 800; color: #01463C; margin-top: 0.75rem; letter-spacing: -0.02em;">
+            Designed for Every Stakeholder in Education
+        </h2>
+        <p style="color: #1F5F55; font-size: 1.05rem; max-width: 680px; margin: 0.5rem auto 0; line-height: 1.6;">
+            A unified, approachable framework connecting educators, learners, families, and school leaders with specialized tools tailored to their everyday routine.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem;">
+        <!-- Demographic 1: Teachers -->
+        <div class="card card-interactive" style="border: 2.5px solid #01463C; border-top: 8px solid #1EACB0; border-radius: 28px; box-shadow: 0 6px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="margin-bottom: 1.25rem;">
+                    <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; margin-bottom: 0.45rem;">Classroom Instruction</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C;">For Classroom Teachers</h3>
+                    <span style="font-size: 0.82rem; color: #537D75; font-weight: 700;">Assigned 100 Students Cohort</span>
+                </div>
+
+                <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.5rem;">
+                    <li><strong>4-Quadrant Diagnostic Map:</strong> Instantly separate attendance truancy from actual cognitive/dyslexia learning barriers.</li>
+                    <li><strong>Answer Sheet Front-Page Matrix:</strong> Upload and evaluate the official 1-to-15 question sequence (50 Marks) with exact max marks rubrics.</li>
+                    <li><strong>Qualitative Remarks & Scaffolding:</strong> Document specific student weaknesses (e.g. multi-step fractions) and observed growth for every child.</li>
+                    <li><strong>Closed-Loop RTI Tracker:</strong> 4-Week milestone checklist with live % completion progress bars and post-remedial score verification.</li>
+                    <li><strong>Parent Consultation Inbox:</strong> Review and respond directly to parental queries on home pacing and materials.</li>
+                </ul>
+            </div>
+
+            <a href="{{ url_for('login', role='teacher') }}" class="btn btn-secondary" style="width: 100%; font-size: 0.94rem;">
+                Explore Teacher Workspace &rarr;
+            </a>
+        </div>
+
+        <!-- Demographic 2: Students -->
+        <div class="card card-interactive" style="border: 2.5px solid #01463C; border-top: 8px solid #9B74FF; border-radius: 28px; box-shadow: 0 6px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="margin-bottom: 1.25rem;">
+                    <span class="role-badge-tag" style="background: #F3EEFF; color: #01463C; margin-bottom: 0.45rem;">Learner Support</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C;">For Students & Children</h3>
+                    <span style="font-size: 0.82rem; color: #537D75; font-weight: 700;">Empowering & Low-Anxiety Learning</span>
+                </div>
+
+                <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.5rem;">
+                    <li><strong>CBSE 30-Marks Assessment Suite:</strong> Choose Mathematics, Science, Social Science, English, or Hindi for balanced 15 MCQ + 5 Typed tests.</li>
+                    <li><strong>Voice Dictation (Speech-to-Text):</strong> Dictate written answers using microphone speech recognition—eliminating dysgraphia barriers.</li>
+                    <li><strong>Interactive Reading Ruler:</strong> Tinted focus line following the cursor/finger to prevent eye fatigue and line-skipping.</li>
+                    <li><strong>Irlen Syndrome Color Overlays:</strong> Switch between Peach Rose, Mint Aqua, Canary Yellow, and Soft Lavender backdrops.</li>
+                    <li><strong>Zero Stress Policy:</strong> No countdown clocks, no punitive buzzers; instant encouraging badges and gentle synthesizer audio chimes.</li>
+                </ul>
+            </div>
+
+            <a href="{{ url_for('login', role='student') }}" class="btn btn-secondary" style="width: 100%; font-size: 0.94rem;">
+                Explore Student Portal &rarr;
+            </a>
+        </div>
+
+        <!-- Demographic 3: Parents -->
+        <div class="card card-interactive" style="border: 2.5px solid #01463C; border-top: 8px solid #F0AF00; border-radius: 28px; box-shadow: 0 6px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="margin-bottom: 1.25rem;">
+                    <span class="role-badge-tag" style="background: #FFF7E6; color: #01463C; margin-bottom: 0.45rem;">Home Partnership</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C;">For Parents & Families</h3>
+                    <span style="font-size: 0.82rem; color: #537D75; font-weight: 700;">Empowering Home Scaffolding</span>
+                </div>
+
+                <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.5rem;">
+                    <li><strong>Confidential Growth Dashboard:</strong> Transparently view your child's learning trajectory without exposing peer records.</li>
+                    <li><strong>Strengths-First Celebration:</strong> Clear summary highlighting what your child excels in before addressing gaps.</li>
+                    <li><strong>Teacher Remarks & Weakness Insights:</strong> Read the teacher's exact qualitative feedback on where support is needed.</li>
+                    <li><strong>Direct Teacher Chat & Query Center:</strong> Ask questions directly to your child's assigned teacher regarding homework and visual materials.</li>
+                    <li><strong>Fun Home Activities:</strong> Bite-sized, stress-free practice ideas that reinforce classroom concepts peacefully.</li>
+                </ul>
+            </div>
+
+            <a href="{{ url_for('login', role='parent') }}" class="btn btn-secondary" style="width: 100%; font-size: 0.94rem;">
+                Explore Parent Portal &rarr;
+            </a>
+        </div>
+
+        <!-- Demographic 4: Principal -->
+        <div class="card card-interactive" style="border: 2.5px solid #01463C; border-top: 8px solid #01463C; border-radius: 28px; box-shadow: 0 6px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="margin-bottom: 1.25rem;">
+                    <span class="role-badge-tag" style="background: #F8E7CD; color: #01463C; margin-bottom: 0.45rem;">Governance</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C;">For School Leadership</h3>
+                    <span style="font-size: 0.82rem; color: #537D75; font-weight: 700;">Institutional Health & Governance</span>
+                </div>
+
+                <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.5rem;">
+                    <li><strong>300-Student Macro Analytics:</strong> School-wide distribution across Priority Support, Guided Support, and On-Track progression.</li>
+                    <li><strong>3-Educator Comparison Grid:</strong> Side-by-side analysis of Teacher 1, 2, and 3 (100 students each) to assess teacher workload and capacity.</li>
+                    <li><strong>School-Wide 4-Quadrant Map:</strong> High-altitude visualization mapping attendance health against curriculum achievement.</li>
+                    <li><strong>Institutional Privacy Firewall:</strong> Private teacher-parent consultation dialogues are strictly protected from administrative view.</li>
+                    <li><strong>1-Click Archival Exports:</strong> Download school-wide CSV registries for regulatory and CBSE compliance.</li>
+                </ul>
+            </div>
+
+            <a href="{{ url_for('login', role='principal') }}" class="btn btn-secondary" style="width: 100%; font-size: 0.94rem;">
+                Explore Leadership Dashboard &rarr;
+            </a>
+        </div>
+
+        <!-- Demographic 5: School Counselor & LD Care -->
+        <div class="card card-interactive" style="border: 2.5px solid #01463C; border-top: 8px solid #1EACB0; border-radius: 28px; box-shadow: 0 6px 0 #01463C; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="margin-bottom: 1.25rem;">
+                    <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; margin-bottom: 0.45rem;">Counseling &amp; LD Screening</span>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C;">For School Counselors</h3>
+                    <span style="font-size: 0.82rem; color: #537D75; font-weight: 700;">Special Learning Needs &amp; Simple Study Exercises</span>
+                </div>
+
+                <ul style="padding-left: 1.25rem; font-size: 0.92rem; color: #1F5F55; line-height: 1.6; margin-bottom: 1.5rem;">
+                    <li><strong>Sectioned Screening Roster:</strong> Group children showing learning disability profiles or early screening possibilities for calm support—never labels.</li>
+                    <li><strong>3-Way Connect Inbox:</strong> Direct messages, referrals, and check-ins from Students, Parents, and Teachers in one calm workspace.</li>
+                    <li><strong>Live Study Exercise Publisher:</strong> Push simple 10-minute step-by-step study routines straight to Student and Parent portals.</li>
+                    <li><strong>AI Chat Guidance Sync:</strong> Published exercises and child profiles feed straight into Student &amp; Parent AI Chatbots.</li>
+                </ul>
+            </div>
+
+            <a href="{{ url_for('login', role='counselor') }}" class="btn btn-doorbell" style="width: 100%; font-size: 0.94rem;">
+                Explore Counselor Workspace &rarr;
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CORE PLATFORM FEATURES GRID -->
+<section style="margin-bottom: 3.5rem;">
+    <div class="card" style="padding: 2.75rem 2.5rem; background: #F8E7CD; border: 2.5px solid #01463C; border-radius: 32px; box-shadow: 0 6px 0 #01463C;">
+        <h3 style="font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 2rem; letter-spacing: -0.02em; color: #01463C;">
+            Unique Innovative Features of SEHAYAK
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+            <div style="background: #FFFFFF; padding: 1.6rem; border-radius: 22px; border: 2px solid #01463C; box-shadow: 0 4px 0 #01463C;">
+                <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; margin-bottom: 0.65rem;">Algorithm</span>
+                <h4 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.45rem; color: #01463C;">Dual-Engine Explainable AI</h4>
+                <p style="font-size: 0.92rem; color: #1F5F55; line-height: 1.55;">
+                    Scikit-Learn Random Forest model paired with transparent pedagogical heuristic safeguards. Features SHAP-style local factor contribution breakdowns.
+                </p>
+            </div>
+
+            <div style="background: #FFFFFF; padding: 1.6rem; border-radius: 22px; border: 2px solid #01463C; box-shadow: 0 4px 0 #01463C;">
+                <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; margin-bottom: 0.65rem;">Curriculum</span>
+                <h4 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.45rem; color: #01463C;">CBSE Front-Sheet Grading</h4>
+                <p style="font-size: 0.92rem; color: #1F5F55; line-height: 1.55;">
+                    Digital front-cover rubric with 1-to-15 question sequence (50 Marks), marks obtained tabulation, and qualitative remarks on specific student weaknesses and growth.
+                </p>
+            </div>
+
+            <div style="background: #FFFFFF; padding: 1.6rem; border-radius: 22px; border: 2px solid #01463C; box-shadow: 0 4px 0 #01463C;">
+                <span class="role-badge-tag" style="background: #F3EEFF; color: #01463C; margin-bottom: 0.65rem;">Inclusion</span>
+                <h4 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.45rem; color: #01463C;">WCAG 2.1 AA/AAA Dyslexia Suite</h4>
+                <p style="font-size: 0.92rem; color: #1F5F55; line-height: 1.55;">
+                    Specialized Lexend and OpenDyslexic typography, cursor-tracking Reading Ruler focus bar, Irlen color overlays, and bilingual Web Speech read-aloud.
+                </p>
+            </div>
+
+            <div style="background: #FFFFFF; padding: 1.6rem; border-radius: 22px; border: 2px solid #01463C; box-shadow: 0 4px 0 #01463C;">
+                <span class="role-badge-tag" style="background: #FFF7E6; color: #01463C; margin-bottom: 0.65rem;">Intervention</span>
+                <h4 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.45rem; color: #01463C;">Closed-Loop RTI Progress Tracker</h4>
+                <p style="font-size: 0.92rem; color: #1F5F55; line-height: 1.55;">
+                    Transforms static recommendations into an active Response to Intervention cycle with milestone checkboxes, live progress bars, and post-test efficacy verification.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ETHICAL FOUNDATION BANNER -->
+<section style="margin-bottom: 2rem;">
+    <div class="ethical-banner" style="background: #F8E7CD; border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; padding: 1.5rem 2rem;">
+        <div>
+            <h4 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.4rem; color: #01463C;">
+                Ethical Philosophy: Flags are for Support, Never for Stigmatization
+            </h4>
+            <p style="font-size: 0.94rem; color: #1F5F55; line-height: 1.6; margin: 0;">
+                SEHAYAK is designed strictly as an educational screening and pedagogical capacity building platform. It does not provide clinical diagnoses of learning disabilities. All insights exist to guide educators and parents in tailoring multisensory instruction.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

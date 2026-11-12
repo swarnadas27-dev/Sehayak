@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 950px; margin: 1rem auto;">
+    <!-- Subject Selection Banner -->
+    <div class="card card-sand" style="border: 2.5px solid #01463C; border-radius: 28px; padding: 2.25rem 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 0 #01463C;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;">
+            <div>
+                <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF; border: 1.5px solid #01463C; margin-bottom: 0.5rem;">
+                    CBSE 30-Marks Assessment Suite
+                </span>
+                <h2 style="font-size: 1.95rem; font-weight: 800; margin-top: 0.5rem; margin-bottom: 0.35rem; color: #01463C; letter-spacing: -0.02em;">
+                    {{ current_test.title }}
+                </h2>
+                <p style="font-size: 1rem; color: #1F5F55; max-width: 650px; line-height: 1.55;">
+                    {{ current_test.description }} Total: <strong>30 Marks</strong> (15 Marks MCQs + 15 Marks Conceptual Written Responses). No timers, no stress.
+                </p>
+            </div>
+            <div style="text-align: right;">
+                <span class="badge-support badge-ontrack" style="font-size: 0.95rem; padding: 0.6rem 1.25rem;">
+                    30 Marks Total
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Choose Subject Tabs -->
+    <div style="margin-bottom: 1.75rem;">
+        <span style="font-size: 0.85rem; font-weight: 800; color: #01463C; display: block; margin-bottom: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            Select CBSE Subject Test:
+        </span>
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <a href="{{ url_for('take_test_view', subject='mathematics') }}"
+               class="btn btn-secondary {% if selected_subject == 'mathematics' %}active{% endif %}"
+               style="font-size: 0.9rem; padding: 0.5rem 1.25rem;">
+                Mathematics (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='science') }}"
+               class="btn btn-secondary {% if selected_subject == 'science' %}active{% endif %}"
+               style="font-size: 0.9rem; padding: 0.5rem 1.25rem;">
+                Science (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='social science') }}"
+               class="btn btn-secondary {% if selected_subject == 'social science' %}active{% endif %}"
+               style="font-size: 0.9rem; padding: 0.5rem 1.25rem;">
+                Social Science (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='english') }}"
+               class="btn btn-secondary {% if selected_subject == 'english' %}active{% endif %}"
+               style="font-size: 0.9rem; padding: 0.5rem 1.25rem;">
+                English (30M)
+            </a>
+            <a href="{{ url_for('take_test_view', subject='hindi') }}"
+               class="btn btn-secondary {% if selected_subject == 'hindi' %}active{% endif %}"
+               style="font-size: 0.9rem; padding: 0.5rem 1.25rem;">
+                हिन्दी (30M)
+            </a>
+        </div>
+    </div>
+
+    <!-- Test Submission Form -->
+    <form method="POST" action="{{ url_for('submit_test') }}">
+        <input type="hidden" name="subject" value="{{ selected_subject }}">
+
+        <!-- SECTION A: 15 Multiple Choice Questions (15 Marks) -->
+        <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C; letter-spacing: -0.01em;">
+                        Section A: Objective Multiple Choice Questions
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        15 Questions &bull; 1 Mark Each &bull; Total: 15 Marks
+                    </p>
+                </div>
+                <span class="badge-support badge-guided">15 Marks</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% for q in current_test.mcqs %}
+                <div style="padding: 1.35rem; background: var(--bg-surface-alt); border-radius: 18px; border: 2px solid #01463C; box-shadow: 0 3px 0 #E2D3BE;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="font-size: 1.05rem; font-weight: 700; line-height: 1.5; color: #01463C;" id="mcq-q-{{ q.id }}">
+                            <span style="color: #9B74FF; font-weight: 800;">Q{{ loop.index }}.</span> {{ q.question }}
+                        </div>
+                        <button type="button" class="btn btn-tts tts-btn" data-target-id="mcq-q-{{ q.id }}" data-lang="{{ 'hi' if selected_subject == 'hindi' else 'en' }}" style="padding: 0.3rem 0.75rem; font-size: 0.82rem;">
+                            Listen
+                        </button>
+                    </div>
+
+                    <!-- Options -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+                        {% for opt in q.options %}
+                        <label style="display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem 1rem; background: #FFFFFF; border: 2px solid #01463C; border-radius: 14px; cursor: pointer; font-size: 0.95rem; font-weight: 600; box-shadow: 0 2px 0 #01463C; transition: all 0.15s ease;">
+                            <input type="radio" name="mcq_{{ q.id }}" value="{{ loop.index0 }}" style="transform: scale(1.2); accent-color: #9B74FF;">
+                            <span><strong style="color: #9B74FF;">{{ ['A', 'B', 'C', 'D'][loop.index0] }}.</strong> {{ opt }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Visual Hint -->
+                    <details style="font-size: 0.88rem; color: #01463C;">
+                        <summary style="cursor: pointer; font-weight: 700; color: #01463C;">Need a Visual Hint?</summary>
+                        <div style="padding: 0.75rem 1rem; background: #FFF7E6; border: 1.5px solid #01463C; border-radius: 12px; margin-top: 0.5rem; line-height: 1.5;">
+                            {{ q.hint }}
+                        </div>
+                    </details>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- SECTION B: 5 Conceptual Short Written / Typed Questions (15 Marks) -->
+        <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: #01463C; letter-spacing: -0.01em;">
+                        Section B: Conceptual Typed / Written Responses
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        5 Questions &bull; 3 Marks Each &bull; Total: 15 Marks (Speech-to-text dictation supported!)
+                    </p>
+                </div>
+                <span class="badge-support badge-ontrack">15 Marks</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+                {% for w in current_test.written %}
+                <div style="padding: 1.35rem; background: var(--bg-surface-alt); border-radius: 18px; border: 2px solid #01463C; box-shadow: 0 3px 0 #E2D3BE;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem;">
+                        <div style="font-size: 1.05rem; font-weight: 700; line-height: 1.5; color: #01463C;" id="w-q-{{ w.id }}">
+                            <span style="color: #059669; font-weight: 800;">Q{{ loop.index + 15 }}. [3 Marks]</span> {{ w.question }}
+                        </div>
+                        <button type="button" class="btn btn-tts tts-btn" data-target-id="w-q-{{ w.id }}" data-lang="{{ 'hi' if selected_subject == 'hindi' else 'en' }}" style="padding: 0.3rem 0.75rem; font-size: 0.82rem;">
+                            Listen
+                        </button>
+                    </div>
+
+                    <!-- Typed Textarea with Dictate Button -->
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+                            <label for="txt-{{ w.id }}" style="font-size: 0.88rem; font-weight: 700; color: #01463C;">
+                                Type or Dictate your explanation:
+                            </label>
+                            <button type="button" class="btn btn-secondary dictation-btn" data-input-id="txt-{{ w.id }}" style="padding: 0.35rem 0.85rem; font-size: 0.82rem;">
+                                Dictate Answer
+                            </button>
+                        </div>
+                        <textarea id="txt-{{ w.id }}" name="written_{{ w.id }}" rows="3"
+                                  placeholder="Write 2-3 clear sentences explaining the concept in your own words..."
+                                  style="width: 100%; padding: 0.75rem 1rem; border-radius: 14px; border: 2px solid #01463C; background: #FFFFFF; color: #01463C; font-family: inherit; font-size: 0.95rem;"></textarea>
+                    </div>
+
+                    <!-- Hint -->
+                    <details style="font-size: 0.88rem; color: #01463C;">
+                        <summary style="cursor: pointer; font-weight: 700; color: #01463C;">Key Concepts & Hints</summary>
+                        <div style="padding: 0.75rem 1rem; background: #E8F7F6; border: 1.5px solid #01463C; border-radius: 12px; margin-top: 0.5rem; line-height: 1.5;">
+                            {{ w.hint }}
+                        </div>
+                    </details>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Submit Action Card -->
+        <div class="card card-sand" style="text-align: center; padding: 2.5rem 2rem; border-radius: 28px; border: 2.5px solid #01463C; box-shadow: 0 4px 0 #01463C;">
+            <h3 style="font-size: 1.45rem; font-weight: 800; margin-bottom: 0.4rem; color: #01463C; letter-spacing: -0.01em;">
+                Completed your 30-Marks Assessment?
+            </h3>
+            <p style="font-size: 0.95rem; color: #1F5F55; margin-bottom: 1.5rem;">
+                Click below to calculate your marks out of 30, view instant feedback, and receive your Growth Badge.
+            </p>
+            <button type="submit" class="btn btn-doorbell" style="padding: 0.95rem 3.5rem; font-size: 1.15rem;">
+                Submit Test & Check My 30-Marks Score
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Dictation Script using Web Speech Recognition -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const dictBtns = document.querySelectorAll(".dictation-btn");
+
+    dictBtns.forEach(btn => {
+        if (!SpeechRecognition) {
+            btn.title = "Speech recognition is not supported in this browser.";
+            btn.style.opacity = "0.6";
+            return;
+        }
+
+        btn.addEventListener("click", () => {
+            const targetId = btn.getAttribute("data-input-id");
+            const targetInput = document.getElementById(targetId);
+            if (!targetInput) return;
+
+            const recognition = new SpeechRecognition();
+            const isHindi = "{{ selected_subject }}" === "hindi";
+            recognition.lang = isHindi ? "hi-IN" : "en-IN";
+            recognition.interimResults = false;
+
+            btn.textContent = "Listening... Speak now";
+            btn.style.background = "#FEE2E2";
+
+            recognition.onresult = (event) => {
+                const spoken = event.results[0][0].transcript;
+                targetInput.value = targetInput.value ? `${targetInput.value} ${spoken}` : spoken;
+                btn.textContent = "Dictate Answer";
+                btn.style.background = "";
+            };
+
+            recognition.onerror = () => {
+                btn.textContent = "Dictate Answer";
+                btn.style.background = "";
+            };
+
+            recognition.onend = () => {
+                btn.textContent = "Dictate Answer";
+                btn.style.background = "";
+            };
+
+            recognition.start();
+        });
+    });
+});
+</script>
+{% endblock %}

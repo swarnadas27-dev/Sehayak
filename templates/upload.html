@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 1rem auto;">
+    <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.85rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem; letter-spacing: -0.02em;">
+            Upload Student Assessment Records
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            Upload a CSV containing class assessment marks, attendance rates, and assignment data. SEHAYAK will automatically validate records, clean data, and execute the risk model.
+        </p>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="card" style="border: 2.5px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C; padding: 2.25rem; margin-bottom: 2rem;">
+        <form method="POST" action="{{ url_for('upload_data') }}" enctype="multipart/form-data">
+            <div style="border: 2.5px dashed #01463C; border-radius: 20px; padding: 2.5rem; text-align: center; background: var(--bg-surface-alt); margin-bottom: 1.75rem;">
+                <div class="status-pill status-pill-guided" style="margin: 0 auto 0.75rem; width: fit-content; font-size: 0.85rem; padding: 0.4rem 1.15rem;">
+                    <span class="status-dot status-guided-dot"></span> CSV Ingestion
+                </div>
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem; color: #01463C;">
+                    Select Student Assessment CSV File
+                </h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                    Standard UTF-8 CSV formats supported
+                </p>
+                <input type="file" name="csv_file" accept=".csv" required
+                       style="display: block; margin: 0 auto; font-size: 0.92rem;">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <a href="{{ url_for('download_sample_csv') }}" class="btn btn-secondary" style="font-size: 0.9rem;">
+                    Download Sample CSV Template
+                </a>
+                <button type="submit" class="btn btn-doorbell" style="padding: 0.75rem 2rem; font-size: 1rem;">
+                    Ingest & Run Risk Assessment
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- CSV Schema Guide Card -->
+    <div class="card" style="border: 2px solid #01463C; border-radius: 26px; box-shadow: 0 4px 0 #01463C;">
+        <div class="card-title">Expected CSV Columns Guide</div>
+        <div class="table-responsive" style="border: 2px solid #01463C; border-radius: 20px;">
+            <table class="data-table" style="font-size: 0.88rem;">
+                <thead>
+                    <tr>
+                        <th>Column Field Name</th>
+                        <th>Type</th>
+                        <th>Description & Examples</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>student_id</code></td>
+                        <td>String</td>
+                        <td>Unique identifier (e.g. <code>SH-2026-001</code>)</td>
+                    </tr>
+                    <tr>
+                        <td><code>name</code></td>
+                        <td>String</td>
+                        <td>Student full name (e.g. <code>Aarav Sharma</code>)</td>
+                    </tr>
+                    <tr>
+                        <td><code>grade</code>, <code>section</code></td>
+                        <td>String / Int</td>
+                        <td>Class level (e.g. <code>8</code>, <code>A</code>)</td>
+                    </tr>
+                    <tr>
+                        <td><code>attendance_rate</code></td>
+                        <td>Float (0-100)</td>
+                        <td>Current attendance percentage (CBSE benchmark &ge; 75%)</td>
+                    </tr>
+                    <tr>
+                        <td><code>assignment_completion_rate</code></td>
+                        <td>Float (0-100)</td>
+                        <td>Percentage of homework/assignments submitted</td>
+                    </tr>
+                    <tr>
+                        <td><code>math_sa2</code>, <code>science_sa2</code>, ...</td>
+                        <td>Float (0-100)</td>
+                        <td>Subject assessment scores (Math, Science, English, Social, Hindi)</td>
+                    </tr>
+                    <tr>
+                        <td><code>reading_speed_wpm</code></td>
+                        <td>Float / Int</td>
+                        <td>Words per minute proxy for reading pacing & dyslexia support</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
