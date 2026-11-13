@@ -13,27 +13,37 @@ function renderRiskDonut(highCount, moderateCount, onTrackCount, containerId = "
     const container = document.getElementById(containerId);
     if (!container || typeof Plotly === "undefined") return;
 
+    const totalStudents = highCount + moderateCount + onTrackCount;
+
+    // Ordered to match reference mockup: Green (On-Track) on left, Amber (Guided) at bottom, Red (Priority) on right
     const data = [{
-        values: [highCount, moderateCount, onTrackCount],
-        labels: ["Priority Support", "Guided Support", "On-Track"],
+        values: [onTrackCount, moderateCount, highCount],
+        labels: ["On-Track", "Guided Support", "Priority Support"],
         type: "pie",
-        hole: 0.58,
+        hole: 0.68,
+        sort: false,
+        direction: "clockwise",
+        rotation: 0,
         marker: {
-            colors: ["#DC2626", "#D97706", "#059669"]
+            colors: ["#059669", "#D97706", "#DC2626"]
         },
-        textinfo: "label+percent",
-        textposition: "outside",
-        automargin: true,
+        textinfo: "none",
         hoverinfo: "label+value+percent"
     }];
 
     const layout = {
         showlegend: false,
-        height: 280,
-        margin: { l: 20, r: 20, t: 20, b: 20 },
+        height: 220,
+        margin: { l: 8, r: 8, t: 8, b: 8 },
         paper_bgcolor: "transparent",
         plot_bgcolor: "transparent",
-        font: { family: "Lexend, sans-serif", size: 12 }
+        font: { family: "PT Sans, Lexend, sans-serif", size: 12 },
+        annotations: [{
+            showarrow: false,
+            text: `<span style="font-size:32px;font-weight:800;color:#01463C;line-height:1;">${totalStudents}</span><br><span style="font-size:14px;font-weight:600;color:#537D75;line-height:1.4;">Students</span>`,
+            x: 0.5,
+            y: 0.5
+        }]
     };
 
     const config = { responsive: true, displayModeBar: false };
@@ -44,44 +54,62 @@ function renderSubjectAverages(subjectAvgs, containerId = "subject-bar-chart") {
     const container = document.getElementById(containerId);
     if (!container || typeof Plotly === "undefined") return;
 
-    const subjects = ["Mathematics", "Science", "English", "Social Science", "Hindi"];
+    const subjects = ["Maths", "Science", "English", "Social Science", "Hindi"];
     const keys = ["math", "science", "english", "social", "hindi"];
     const values = keys.map(k => subjectAvgs[k] || 0);
-
-    const colors = values.map(v => v < 40 ? "#DC2626" : v < 55 ? "#D97706" : "#2563EB");
 
     const data = [{
         x: subjects,
         y: values,
         type: "bar",
-        marker: { color: colors, opacity: 0.85 },
+        marker: { 
+            color: "#2563EB",
+            opacity: 0.9,
+            line: { color: "#1D4ED8", width: 1.5 }
+        },
         text: values.map(v => `${v}%`),
-        textposition: "auto"
+        textposition: "outside",
+        cliponaxis: false,
+        hovertemplate: "<b>%{x}</b><br>Average: %{y:.1f}%<br>Benchmark: 35%<extra></extra>"
     }];
 
     const layout = {
-        height: 280,
-        margin: { l: 40, r: 20, t: 20, b: 40 },
+        height: 230,
+        margin: { l: 38, r: 15, t: 25, b: 35 },
         paper_bgcolor: "transparent",
         plot_bgcolor: "transparent",
-        yaxis: { range: [0, 100], title: "Class Average (%)" },
-        font: { family: "Lexend, sans-serif", size: 12 },
+        yaxis: { 
+            range: [0, 100], 
+            title: { text: "Score (%)", font: { size: 10, color: "#537D75" } },
+            gridcolor: "#EADBC8",
+            zeroline: false,
+            tickfont: { size: 10, color: "#537D75" }
+        },
+        xaxis: {
+            tickfont: { size: 11, color: "#01463C", family: "inherit", weight: 600 }
+        },
+        font: { family: "PT Sans, Lexend, sans-serif", size: 11 },
         shapes: [{
             type: "line",
             x0: -0.5,
             x1: 4.5,
             y0: 35,
             y1: 35,
-            line: { color: "#DC2626", width: 2, dash: "dot" }
+            line: { color: "#DC2626", width: 1.5, dash: "dot" }
         }],
         annotations: [{
-            x: 0.5,
-            y: 38,
+            x: 4.5,
+            y: 42,
             xref: "x",
             yref: "y",
-            text: "35% Benchmark Threshold",
+            text: "35% Benchmark",
             showarrow: false,
-            font: { color: "#DC2626", size: 10 }
+            xanchor: "right",
+            font: { color: "#DC2626", size: 10, weight: "bold" },
+            bgcolor: "rgba(254, 242, 242, 0.9)",
+            bordercolor: "#FCA5A5",
+            borderwidth: 1,
+            borderpad: 2
         }]
     };
 

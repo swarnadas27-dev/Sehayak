@@ -13,14 +13,28 @@ SYNTHETIC_DATA_DIR = os.path.join(DATA_DIR, "synthetic")
 SYNTHETIC_DATA_PATH = os.path.join(SYNTHETIC_DATA_DIR, "students_sample_250.csv")
 DB_PATH = os.path.join(DATA_DIR, "sehayak.db")
 
+# Vercel Serverless Support: Copy DB to writable /tmp directory if running on Vercel
+if os.environ.get("VERCEL"):
+    import shutil
+    TMP_DIR = "/tmp/sehayak_data"
+    os.makedirs(TMP_DIR, exist_ok=True)
+    TMP_DB = os.path.join(TMP_DIR, "sehayak.db")
+    ORIGINAL_DB = os.path.join(DATA_DIR, "sehayak.db")
+    if not os.path.exists(TMP_DB) and os.path.exists(ORIGINAL_DB):
+        shutil.copyfile(ORIGINAL_DB, TMP_DB)
+    DB_PATH = TMP_DB
+
 # Models path
 MODELS_DIR = os.path.join(BASE_DIR, "models", "trained")
 MODEL_FILE = os.path.join(MODELS_DIR, "risk_classifier.joblib")
 SCALER_FILE = os.path.join(MODELS_DIR, "scaler.joblib")
 
 # Ensure required directories exist
-for folder in [RAW_DATA_DIR, SYNTHETIC_DATA_DIR, MODELS_DIR]:
-    os.makedirs(folder, exist_ok=True)
+try:
+    for folder in [RAW_DATA_DIR, SYNTHETIC_DATA_DIR, MODELS_DIR]:
+        os.makedirs(folder, exist_ok=True)
+except OSError:
+    pass
 
 # Flask Configuration
 SECRET_KEY = os.environ.get("SECRET_KEY", "sehayak-psb152-edtech-secret-key-2026")
