@@ -1,58 +1,113 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Ethical Non-Stigmatizing Notice Banner -->
-<div class="ethical-banner" role="status">
-    <div>
-        <strong>Support Framework Philosophy:</strong>
-        All flags are early developmental scaffolding indicators for targeted remediation, not persistent diagnostic labels. Every child can thrive with adapted multisensory pathways.
-    </div>
-</div>
-
-<!-- Class-Level Metric Cards (Tactile Tiles) -->
-<div class="kpi-grid">
-    <div class="kpi-card" style="border: 2.5px solid #01463C; box-shadow: 0 4px 0 #01463C; border-radius: 24px; background: #FFFFFF;">
-        <div class="kpi-title" style="color: #01463C;">{{ t('total_students') }}</div>
-        <div class="kpi-value" style="color: #01463C;">{{ analytics.total_students }}</div>
-        <div class="kpi-subtext" style="color: #537D75;">Active assessment records</div>
-    </div>
-    <div class="kpi-card" style="border: 2.5px solid #DC2626; box-shadow: 0 4px 0 #991B1B; border-radius: 24px; background: #FEF2F2;">
-        <div class="kpi-title" style="color: #991B1B;">{{ t('priority_support') }}</div>
-        <div class="kpi-value" style="color: #DC2626;">{{ analytics.high_risk_count }}</div>
-        <div class="kpi-subtext" style="color: #991B1B;">Urgent multisensory intervention needed</div>
-    </div>
-    <div class="kpi-card" style="border: 2.5px solid #D97706; box-shadow: 0 4px 0 #92400E; border-radius: 24px; background: #FFFBEB;">
-        <div class="kpi-title" style="color: #92400E;">{{ t('guided_support') }}</div>
-        <div class="kpi-value" style="color: #D97706;">{{ analytics.moderate_risk_count }}</div>
-        <div class="kpi-subtext" style="color: #92400E;">Foundational pacing & review needed</div>
-    </div>
-    <div class="kpi-card" style="border: 2.5px solid #059669; box-shadow: 0 4px 0 #065F46; border-radius: 24px; background: #ECFDF5;">
-        <div class="kpi-title" style="color: #065F46;">{{ t('on_track') }}</div>
-        <div class="kpi-value" style="color: #059669;">{{ analytics.on_track_count }}</div>
-        <div class="kpi-subtext" style="color: #065F46;">Steady conceptual mastery</div>
-    </div>
-    <div class="kpi-card" style="border: 2.5px solid #01463C; box-shadow: 0 4px 0 #01463C; border-radius: 24px; background: #E8F7F6;">
-        <div class="kpi-title" style="color: #01463C;">{{ t('avg_attendance') }}</div>
-        <div class="kpi-value" style="color: #01463C;">{{ analytics.avg_attendance }}%</div>
-        <div class="kpi-subtext" style="color: #1F5F55;">Benchmark target: &ge; 75%</div>
-    </div>
-</div>
-
-<!-- Interactive Chart Visualizations Grid -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-    <div class="card" style="margin-bottom: 0;">
-        <div class="card-title">
-            <span>Class Support Distribution</span>
-            <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Tiers Breakdown</span>
+<!-- 1. Streamlined Welcome Strip with Integrated Notice -->
+<div class="welcome-strip">
+    <div class="welcome-strip-left">
+        <span class="welcome-strip-avatar">👩‍🏫</span>
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <h2 class="welcome-strip-title" style="margin: 0;">
+                    Welcome back, {{ session.get('user', {}).get('full_name', 'Mrs. Ananya Sharma (Grade 7 Lead)') }}
+                </h2>
+                <span class="kpi-tag kpi-tag-neutral" style="font-size: 0.72rem; padding: 2px 8px;">AY 2025–26</span>
+            </div>
+            <div class="welcome-strip-subtitle" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 3px;">
+                <span>Grade 7 Lead &bull; Term 2 Diagnostic</span>
+                <span style="opacity: 0.4;">|</span>
+                <span style="color: #537D75; font-size: 0.78rem;">
+                    <strong>Support Framework:</strong> Early indicators guide personalized remedial support, not clinical diagnosis.
+                </span>
+            </div>
         </div>
+    </div>
+</div>
+
+<!-- 2. Minimalist KPI Metric Row (Clean, High-Impact Cards) -->
+<div class="kpi-grid-5">
+    <!-- Card 1: Total Students -->
+    <div class="kpi-card-clean">
+        <span class="kpi-label">{{ t('total_students') }}</span>
+        <div class="kpi-number" style="color: #01463C;">{{ analytics.total_students }}</div>
+        <span class="kpi-caption">Active Records</span>
+    </div>
+
+    <!-- Card 2: Priority Support -->
+    <div class="kpi-card-clean">
+        <span class="kpi-label">{{ t('priority_support') }}</span>
+        <div class="kpi-number" style="color: #DC2626;">{{ analytics.high_risk_count }}</div>
+        <span class="kpi-caption" style="color: #DC2626; font-weight: 700;">Remedial Focus</span>
+    </div>
+
+    <!-- Card 3: Guided Support -->
+    <div class="kpi-card-clean">
+        <span class="kpi-label">{{ t('guided_support') }}</span>
+        <div class="kpi-number" style="color: #D97706;">{{ analytics.moderate_risk_count }}</div>
+        <span class="kpi-caption" style="color: #D97706; font-weight: 700;">Foundational Review</span>
+    </div>
+
+    <!-- Card 4: On-Track -->
+    <div class="kpi-card-clean">
+        <span class="kpi-label">{{ t('on_track') }}</span>
+        <div class="kpi-number" style="color: #059669;">{{ analytics.on_track_count }}</div>
+        <span class="kpi-caption" style="color: #059669; font-weight: 700;">Meeting Target</span>
+    </div>
+
+    <!-- Card 5: Class Attendance -->
+    <div class="kpi-card-clean">
+        <span class="kpi-label">{{ t('avg_attendance') }}</span>
+        <div class="kpi-number" style="color: #01463C;">{{ analytics.avg_attendance }}%</div>
+        <span class="kpi-caption" style="color: #059669; font-weight: 700;">&ge; 75% Target met</span>
+    </div>
+</div>
+
+<!-- 3. Classroom Analytics Section (Side-by-Side Donut & Subject Performance) -->
+<div style="margin-bottom: 0.65rem;">
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: #01463C; margin: 0 0 0.75rem;">Classroom Analytics</h3>
+</div>
+
+<div class="analytics-charts-grid">
+    <!-- Card 1: Class Support Distribution -->
+    <div class="analytics-chart-card">
+        <h3 class="chart-clean-title">Class Support Distribution</h3>
         <div id="risk-donut-chart"></div>
-    </div>
-    <div class="card" style="margin-bottom: 0;">
-        <div class="card-title">
-            <span>Subject Averages vs 35% Benchmark</span>
-            <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);">Term 2 Diagnostic</span>
+        <div class="chart-clean-footer">
+            {% set total_st = analytics.total_students if analytics.total_students > 0 else 1 %}
+            {% set p_pct = ((analytics.high_risk_count / total_st) * 100) | round | int %}
+            {% set ot_pct = ((analytics.on_track_count / total_st) * 100) | round | int %}
+            {% set g_pct = ((analytics.moderate_risk_count / total_st) * 100) | round | int %}
+            {{ p_pct }}% Priority &middot; {{ ot_pct }}% On-Track &middot; {{ g_pct }}% Guided
         </div>
-        <div id="subject-bar-chart"></div>
+    </div>
+
+    <!-- Card 2: Subject Performance (Horizontal Progress Bars) -->
+    <div class="analytics-chart-card subject-perf-card">
+        <h3 class="chart-card-title" style="text-align: left; margin-bottom: 0.35rem;">Subject Performance</h3>
+        
+        <div class="subject-perf-list">
+            {% set subjects = [
+                ('Maths', analytics.subject_averages.math),
+                ('Science', analytics.subject_averages.science),
+                ('English', analytics.subject_averages.english),
+                ('Social Science', analytics.subject_averages.social),
+                ('Hindi', analytics.subject_averages.hindi)
+            ] %}
+            {% for name, score in subjects %}
+            <div class="subject-perf-item">
+                <div class="subject-perf-header">
+                    <span class="subject-perf-name">{{ name }}</span>
+                    <span class="subject-perf-score">{{ score }}%</span>
+                </div>
+                <div class="subject-perf-track">
+                    <div class="subject-perf-fill" data-score="{{ score }}"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="subject-perf-benchmark-footer">
+            Benchmark: 35%
+        </div>
     </div>
 </div>
 
@@ -68,141 +123,202 @@
     <div id="quadrant-scatter-chart"></div>
 </div>
 
-<!-- Student Roster & Action Toolbar -->
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+<!-- 5. Counselor Collaboration & Classroom Exercises (Shifted above Roster Table) -->
+<div class="counselor-collab-grid">
+    <!-- Card A: Quick Referral to School Counselor -->
+    <div class="counselor-action-card">
+        <div class="counselor-card-header">
+            <div>
+                <h3 class="counselor-card-title">Quick Referral to Counselor</h3>
+                <span class="counselor-card-subtitle">Dr. Meera Deshmukh &bull; School Counselor</span>
+            </div>
+            <span class="role-badge-tag badge-sectioned">{{ ld_summary.total_sectioned }} Sectioned</span>
+        </div>
+        <p class="counselor-card-desc">
+            Spotting reading fatigue, number swapping, or attention pacing issues? Section student for calm early screening and notify Counselor Ma'am.
+        </p>
+        <form method="POST" action="{{ url_for('teacher_counselor_referral') }}" class="counselor-form">
+            <input type="hidden" name="redirect_to" value="dashboard">
+            <input type="hidden" name="request_type" value="Referral">
+            <input type="hidden" name="ld_screening_status" value="Possibility / Early Screening">
+            
+            <div class="form-row-2col">
+                <select name="student_id" required aria-label="Select Student to Refer" class="form-select-clean">
+                    <option value="" disabled selected>Select Student...</option>
+                    {% for s in students[:40] %}
+                    <option value="{{ s.student_id }}">{{ s.student_id }} &mdash; {{ s.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="ld_category" aria-label="Suspected Learning Focus" class="form-select-clean">
+                    <option value="Dyslexia / Visual Reading">Dyslexia / Visual Reading</option>
+                    <option value="Dyscalculia / Numeracy">Dyscalculia / Numeracy</option>
+                    <option value="Dysgraphia / Written Expression">Dysgraphia / Written Expression</option>
+                    <option value="Attention & Executive Pacing">Attention &amp; Executive Pacing</option>
+                </select>
+            </div>
+            <input type="text" name="subject" required placeholder="Short Subject (e.g., Slow decoding in Maths Q9-Q12)" class="form-input-clean">
+            <textarea name="message" rows="2" required placeholder="What classroom difficulty or reading/math pattern did you spot?" class="form-textarea-clean"></textarea>
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 0.85rem; padding: 0.55rem; border-radius: 10px;">
+                Section Student &amp; Send Note to Counselor
+            </button>
+        </form>
+    </div>
+
+    <!-- Card B: Latest Study Exercises Updated by Counselor -->
+    <div class="counselor-action-card">
+        <div class="counselor-card-header">
+            <div>
+                <h3 class="counselor-card-title">Counselor Study Exercises</h3>
+                <span class="counselor-card-subtitle">Recommended 10-minute classroom techniques</span>
+            </div>
+            <span class="role-badge-tag badge-exercises">Class Support</span>
+        </div>
+        <p class="counselor-card-desc">
+            Share these Counselor-recommended 10-minute classroom techniques alongside daily teaching.
+        </p>
+        <div class="counselor-exercise-list">
+            {% for ex in counselor_exercises %}
+            <div class="exercise-item-card">
+                <div class="exercise-item-header">
+                    <strong class="exercise-item-title">{{ ex.title }}</strong>
+                    <span class="role-badge-tag badge-category">{{ ex.target_category }}</span>
+                </div>
+                <div class="exercise-item-goal">{{ ex.simple_goal }}</div>
+                <div class="exercise-item-meta">Technique: {{ ex.study_technique }} &bull; {{ ex.duration_mins }} mins</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 6. Student Directory (100) Master Roster & Action Toolbar -->
+<div class="roster-card">
+    <div class="roster-header">
         <div>
-            <h2 style="font-size: 1.35rem; font-weight: 800;">
-                {{ t('nav_students') }} ({{ students|length }})
-            </h2>
-            <p style="font-size: 0.88rem; color: var(--text-secondary);">
-                Early risk indicators, attendance monitoring, and tailored remedial intervention pathways.
-            </p>
+            <h2 class="roster-title">{{ t('nav_students') }} ({{ students|length }})</h2>
+            <p class="roster-subtitle">Early risk indicators, attendance monitoring, and tailored remedial intervention pathways.</p>
         </div>
 
-        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-            <a href="{{ url_for('upload_data') }}" class="btn btn-secondary">
+        <div class="roster-actions">
+            <a href="{{ url_for('upload_data') }}" class="btn btn-secondary btn-sm-pill">
                 {{ t('nav_upload') }}
             </a>
-            <a href="{{ url_for('export_students_csv', risk=current_risk) }}" class="btn btn-secondary">
+            <a href="{{ url_for('export_students_csv', risk=current_risk) }}" class="btn btn-secondary btn-sm-pill">
                 {{ t('download_csv') }}
             </a>
         </div>
     </div>
 
     <!-- Filter Pills & Search Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; background: #F8E7CD; padding: 0.65rem 1rem; border-radius: 9999px; border: 2.5px solid #01463C; box-shadow: 0 3px 0 #01463C;">
-        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+    <div class="roster-toolbar">
+        <div class="roster-filter-pills">
             <a href="{{ url_for('dashboard', risk='ALL', search=current_search) }}"
-               class="btn btn-secondary {% if current_risk == 'ALL' or not current_risk %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.85rem; border-radius: 9999px;">
+               class="roster-pill {% if current_risk == 'ALL' or not current_risk %}active{% endif %}">
                 All Students
             </a>
             <a href="{{ url_for('dashboard', risk='HIGH', search=current_search) }}"
-               class="btn btn-secondary {% if current_risk == 'HIGH' %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.85rem; color: #991B1B; border-radius: 9999px;">
-                <span class="status-dot status-priority-dot"></span> Priority Support ({{ analytics.high_risk_count }})
+               class="roster-pill roster-pill-priority {% if current_risk == 'HIGH' %}active{% endif %}">
+                <span class="status-dot status-priority-dot"></span> Priority ({{ analytics.high_risk_count }})
             </a>
             <a href="{{ url_for('dashboard', risk='MODERATE', search=current_search) }}"
-               class="btn btn-secondary {% if current_risk == 'MODERATE' %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.85rem; color: #92400E; border-radius: 9999px;">
-                <span class="status-dot status-guided-dot"></span> Guided Support ({{ analytics.moderate_risk_count }})
+               class="roster-pill roster-pill-guided {% if current_risk == 'MODERATE' %}active{% endif %}">
+                <span class="status-dot status-guided-dot"></span> Guided ({{ analytics.moderate_risk_count }})
             </a>
             <a href="{{ url_for('dashboard', risk='LOW', search=current_search) }}"
-               class="btn btn-secondary {% if current_risk == 'LOW' and current_ld != 'SECTIONED' %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.85rem; color: #065F46; border-radius: 9999px;">
+               class="roster-pill roster-pill-ontrack {% if current_risk == 'LOW' and current_ld != 'SECTIONED' %}active{% endif %}">
                 <span class="status-dot status-ontrack-dot"></span> On-Track ({{ analytics.on_track_count }})
             </a>
             <a href="{{ url_for('dashboard', ld='SECTIONED', search=current_search) }}"
-               class="btn btn-secondary {% if current_ld == 'SECTIONED' %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.9rem; color: #01463C; background: #E8F7F6; border-radius: 9999px;">
-                LD &amp; Early Screening ({{ ld_summary.total_sectioned }})
+               class="roster-pill roster-pill-ld {% if current_ld == 'SECTIONED' %}active{% endif %}">
+                LD Screening ({{ ld_summary.total_sectioned }})
             </a>
         </div>
 
-        <form method="GET" action="{{ url_for('dashboard') }}" style="display: flex; gap: 0.45rem; align-items: center;">
+        <form method="GET" action="{{ url_for('dashboard') }}" class="roster-search-form">
             <input type="hidden" name="risk" value="{{ current_risk }}">
             <input type="text" name="search" value="{{ current_search|default('') }}"
                    placeholder="Search student or ID..."
-                   style="padding: 0.45rem 1.15rem; border: 2px solid #01463C; border-radius: 9999px; background: #FFFFFF; color: #01463C; font-size: 0.88rem; font-family: inherit; font-weight: 600;">
-            <button type="submit" class="btn btn-primary" style="padding: 0.45rem 1.15rem; font-size: 0.85rem; border-radius: 9999px;">Search</button>
+                   class="roster-search-input">
+            <button type="submit" class="roster-search-btn">Search</button>
         </form>
     </div>
 
     <!-- Student Table -->
     <div class="table-responsive">
-        <table class="data-table" aria-label="Student Assessment Roster">
+        <table class="roster-table" aria-label="Student Assessment Roster">
             <thead>
                 <tr>
-                    <th scope="col">Student ID</th>
-                    <th scope="col">Student Name</th>
-                    <th scope="col">Grade</th>
-                    <th scope="col">Attendance</th>
-                    <th scope="col">Term 2 Marks</th>
-                    <th scope="col">Trend</th>
-                    <th scope="col">Support Status</th>
-                    <th scope="col">Primary Support Driver</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col" style="width: 105px;">Student ID</th>
+                    <th scope="col" style="min-width: 140px;">Student Name</th>
+                    <th scope="col" style="width: 85px;">Grade</th>
+                    <th scope="col" style="width: 105px;">Attendance</th>
+                    <th scope="col" style="width: 95px;">Term 2 Marks</th>
+                    <th scope="col" style="width: 80px;">Trend</th>
+                    <th scope="col" style="width: 140px;">Support Status</th>
+                    <th scope="col" style="min-width: 200px;">Primary Support Driver</th>
+                    <th scope="col" style="width: 145px; text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in students %}
                 <tr>
-                    <td style="font-family: monospace; font-size: 0.85rem; font-weight: 600;">
+                    <td class="col-student-id">
                         {{ s.student_id }}
                     </td>
-                    <td style="font-weight: 600;">
-                        {{ s.name }}
-                        {% if s.archetype == 'Reading/Language Barrier' %}
-                            <span class="role-badge-tag" style="background: #EFF6FF; color: #1E40AF; padding: 0.1rem 0.4rem; font-size: 0.7rem; margin-left: 0.35rem;">Reading</span>
-                        {% endif %}
-                        {% if s.ld_screening_status and s.ld_screening_status != 'None' %}
-                            <div style="margin-top: 0.25rem;">
-                                <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; font-size: 0.7rem; padding: 0.12rem 0.45rem;">
-                                    {{ s.ld_screening_status }} &bull; {{ s.ld_category }}
+                    <td class="col-student-name">
+                        <div class="student-name-block">
+                            <span class="student-name-text">{{ s.name }}</span>
+                            {% if s.archetype == 'Reading/Language Barrier' %}
+                                <span class="badge-mini-tag badge-reading">Reading</span>
+                            {% endif %}
+                            {% if s.ld_screening_status and s.ld_screening_status != 'None' %}
+                                <span class="badge-mini-tag badge-ld" title="{{ s.ld_category }}">
+                                    {{ s.ld_category.split('/')[0].strip() }}
                                 </span>
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </td>
-                    <td>Class {{ s.grade }}-{{ s.section }}</td>
-                    <td>
-                        <span style="{% if s.attendance_rate < 75.0 %}color: #DC2626; font-weight: 700;{% endif %}">
-                            {{ "%.1f"|format(s.attendance_rate) }}%
-                        </span>
-                        {% if s.attendance_rate < 75.0 %}
-                            <span class="role-badge-tag" style="background: #FEF2F2; color: #DC2626; padding: 0.1rem 0.4rem; font-size: 0.7rem;">&lt;75%</span>
-                        {% endif %}
+                    <td class="col-grade">Class {{ s.grade }}-{{ s.section }}</td>
+                    <td class="col-attendance">
+                        <div class="attendance-flex">
+                            <span class="{% if s.attendance_rate < 75.0 %}attendance-low{% endif %}">
+                                {{ "%.1f"|format(s.attendance_rate) }}%
+                            </span>
+                            {% if s.attendance_rate < 75.0 %}
+                                <span class="badge-mini-danger">&lt;75%</span>
+                            {% endif %}
+                        </div>
                     </td>
-                    <td>
+                    <td class="col-marks">
                         <strong>{{ "%.1f"|format(s.term2_avg) }}%</strong>
                     </td>
-                    <td>
+                    <td class="col-trend">
                         {% if s.trend_slope > 0 %}
-                            <span style="color: #059669; font-weight: 600;">+{{ "%.1f"|format(s.trend_slope) }}%</span>
+                            <span class="trend-pos">+{{ "%.1f"|format(s.trend_slope) }}%</span>
                         {% elif s.trend_slope < 0 %}
-                            <span style="color: #DC2626; font-weight: 600;">-{{ "%.1f"|format(s.trend_slope|abs) }}%</span>
+                            <span class="trend-neg">-{{ "%.1f"|format(s.trend_slope|abs) }}%</span>
                         {% else %}
-                            <span style="color: var(--text-muted);">0.0%</span>
+                            <span class="trend-neutral">0.0%</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="col-support-status">
                         {% if s.risk_level == 'HIGH' %}
-                            <span class="badge-support badge-priority"><span class="status-dot status-priority-dot"></span> {{ t('priority_support') }}</span>
+                            <span class="table-status-pill pill-priority"><span class="status-dot status-priority-dot"></span> Priority Support</span>
                         {% elif s.risk_level == 'MODERATE' %}
-                            <span class="badge-support badge-guided"><span class="status-dot status-guided-dot"></span> {{ t('guided_support') }}</span>
+                            <span class="table-status-pill pill-guided"><span class="status-dot status-guided-dot"></span> Guided Support</span>
                         {% else %}
-                            <span class="badge-support badge-ontrack"><span class="status-dot status-ontrack-dot"></span> {{ t('on_track') }}</span>
+                            <span class="table-status-pill pill-ontrack"><span class="status-dot status-ontrack-dot"></span> On-Track</span>
                         {% endif %}
                     </td>
-                    <td style="font-size: 0.88rem; max-width: 280px; color: var(--text-secondary);">
+                    <td class="col-driver">
                         {{ s.preview_reason }}
                     </td>
-                    <td>
-                        <div style="display: flex; gap: 0.4rem;">
-                            <a href="{{ url_for('student_detail', student_id=s.student_id) }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;" title="View in-depth diagnostics">
+                    <td class="col-actions">
+                        <div class="table-action-btns">
+                            <a href="{{ url_for('student_detail', student_id=s.student_id) }}" class="btn-table-action btn-action-details" title="View in-depth diagnostics">
                                 Details
                             </a>
-                            <a href="{{ url_for('remedial_plan_view', student_id=s.student_id) }}" class="btn btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;" title="Generate 4-Week Remedial Plan">
+                            <a href="{{ url_for('remedial_plan_view', student_id=s.student_id) }}" class="btn-table-action btn-action-remedial" title="Generate 4-Week Remedial Plan">
                                 Remedial
                             </a>
                         </div>
@@ -219,95 +335,46 @@
         </table>
     </div>
 </div>
-
-<!-- School Counselor Referrals & Updated Classroom Exercises -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-    <div class="card card-mint" style="margin-bottom: 0;">
-        <div class="card-title">
-            <span>Quick Referral to School Counselor (Dr. Meera Deshmukh)</span>
-            <span class="role-badge-tag" style="background: #01463C; color: #FDF7EF;">{{ ld_summary.total_sectioned }} Sectioned</span>
-        </div>
-        <p style="font-size: 0.9rem; color: #1F5F55; line-height: 1.55; margin-bottom: 1rem;">
-            Notice a child swapping numbers, reading slowly under test stress, or losing steps in written math? Section them for calm early screening and notify Counselor Ma'am in one step.
-        </p>
-        <form method="POST" action="{{ url_for('teacher_counselor_referral') }}">
-            <input type="hidden" name="redirect_to" value="dashboard">
-            <input type="hidden" name="request_type" value="Referral">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.65rem;">
-                <select name="student_id" required aria-label="Select Student to Refer"
-                        style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.85rem;">
-                    {% for s in students[:40] %}
-                    <option value="{{ s.student_id }}">{{ s.student_id }} — {{ s.name }}</option>
-                    {% endfor %}
-                </select>
-                <select name="ld_category" aria-label="Suspected Learning Focus"
-                        style="width: 100%; padding: 0.5rem 0.75rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.85rem;">
-                    <option value="Dyslexia / Visual Reading">Dyslexia / Visual Reading</option>
-                    <option value="Dyscalculia / Numeracy">Dyscalculia / Numeracy</option>
-                    <option value="Dysgraphia / Written Expression">Dysgraphia / Written Expression</option>
-                    <option value="Attention & Executive Pacing">Attention &amp; Executive Pacing</option>
-                </select>
-            </div>
-            <input type="hidden" name="ld_screening_status" value="Possibility / Early Screening">
-            <input type="text" name="subject" required placeholder="Short Subject (e.g., Slow decoding in Maths Q9-Q12)"
-                   style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.86rem; margin-bottom: 0.55rem;">
-            <textarea name="message" rows="2" required placeholder="What classroom difficulty or reading/math pattern did you spot?"
-                      style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.86rem; margin-bottom: 0.7rem;"></textarea>
-            <button type="submit" class="btn btn-doorbell" style="width: 100%; font-size: 0.9rem; padding: 0.6rem;">
-                Section Student &amp; Send Note to Counselor
-            </button>
-        </form>
-    </div>
-
-    <div class="card card-sand" style="margin-bottom: 0;">
-        <div class="card-title">
-            <span>Latest Study Exercises Updated by Counselor</span>
-        </div>
-        <p style="font-size: 0.88rem; color: #1F5F55; margin-bottom: 0.85rem;">
-            Share these Counselor-recommended 10-minute classroom techniques alongside daily teaching.
-        </p>
-        <div style="display: grid; gap: 0.75rem;">
-            {% for ex in counselor_exercises %}
-            <div style="background: #FFFFFF; border: 1.5px solid #01463C; border-radius: 14px; padding: 0.85rem 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                    <strong style="font-size: 0.95rem; color: #01463C;">{{ ex.title }}</strong>
-                    <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; font-size: 0.72rem;">{{ ex.target_category }}</span>
-                </div>
-                <div style="font-size: 0.84rem; color: #1F5F55; margin-top: 0.3rem;">{{ ex.simple_goal }}</div>
-                <div style="font-size: 0.8rem; color: #537D75; margin-top: 0.25rem; font-weight: 700;">Technique: {{ ex.study_technique }} &bull; {{ ex.duration_mins }} mins</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    renderRiskDonut(
-        {{ analytics.high_risk_count }},
-        {{ analytics.moderate_risk_count }},
-        {{ analytics.on_track_count }}
-    );
-
-    const subjectAvgs = {{ analytics.subject_averages | tojson }};
-    renderSubjectAverages(subjectAvgs);
-
-    // Render 4-Quadrant Diagnostic Scatter Plot
-    const studentsData = [
+<script type="application/json" id="dashboard-analytics-data">
+{
+    "highRiskCount": {{ analytics.high_risk_count }},
+    "moderateRiskCount": {{ analytics.moderate_risk_count }},
+    "onTrackCount": {{ analytics.on_track_count }},
+    "subjectAverages": {{ analytics.subject_averages | tojson }},
+    "students": [
         {% for s in students %}
         {
-            student_id: "{{ s.student_id }}",
-            name: "{{ s.name }}",
-            attendance_rate: {{ s.attendance_rate }},
-            overall_avg: {{ s.overall_avg }},
-            risk_level: "{{ s.risk_level }}",
-            archetype: "{{ s.archetype }}"
+            "student_id": {{ s.student_id | tojson }},
+            "name": {{ s.name | tojson }},
+            "attendance_rate": {{ s.attendance_rate }},
+            "overall_avg": {{ s.overall_avg }},
+            "risk_level": {{ s.risk_level | tojson }},
+            "archetype": {{ s.archetype | tojson }}
         }{% if not loop.last %},{% endif %}
         {% endfor %}
-    ];
-    renderQuadrantScatter(studentsData);
+    ]
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Dynamically set subject performance progress bar widths
+    document.querySelectorAll(".subject-perf-fill[data-score]").forEach(function(bar) {
+        bar.style.width = bar.getAttribute("data-score") + "%";
+    });
+
+    const dataContainer = document.getElementById("dashboard-analytics-data");
+    if (!dataContainer) return;
+    try {
+        const data = JSON.parse(dataContainer.textContent);
+        renderRiskDonut(data.highRiskCount, data.moderateRiskCount, data.onTrackCount);
+        renderSubjectAverages(data.subjectAverages);
+        renderQuadrantScatter(data.students);
+    } catch (err) {
+        console.error("Failed to parse dashboard analytics data:", err);
+    }
 });
 </script>
 {% endblock %}

@@ -1,0 +1,11 @@
+.venv
+.vscode
+__pycache__
+*.pyc
+tests
+*.docx
+*.pptx
+run.bat
+run.ps1
+.env.local
+

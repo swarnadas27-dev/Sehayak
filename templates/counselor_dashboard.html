@@ -1,556 +1,603 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Counselor Hero Banner -->
-<div class="card card-mint" style="margin-bottom: 2rem; padding: 2.25rem;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
-        <div style="max-width: 720px;">
-            <span class="role-badge-tag" style="background: #1EACB0; color: #FFFFFF; margin-bottom: 0.65rem;">
-                School Counselor &amp; Inclusion Hub
-            </span>
-            <h2 style="font-size: 2rem; font-weight: 800; color: #01463C; margin-bottom: 0.45rem; letter-spacing: -0.02em;">
-                {{ session.get('user', {}).get('full_name', 'School Counselor Workspace') }}
-            </h2>
-            <p style="font-size: 1rem; color: #1F5F55; line-height: 1.6; margin: 0;">
-                Gentle, non-stigmatizing care hub for children with identified learning disabilities or early screening possibilities. Track sectioned students, answer Student/Parent/Teacher check-ins, and publish simple 10-minute study exercises across all portals.
-            </p>
-        </div>
-        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-            <a href="#ld-roster" class="btn btn-secondary">LD Support Roster</a>
-            <a href="#counselor-inbox" class="btn btn-secondary">Support Inbox ({{ pending_count }} Pending)</a>
-            <a href="#exercise-publisher" class="btn btn-doorbell">+ Publish Study Exercise</a>
-        </div>
-    </div>
-</div>
-
-<!-- KPI Summary Strip -->
-<div class="kpi-grid" style="margin-bottom: 2rem;">
-    <div class="card kpi-card" style="background: #F8E7CD; margin-bottom: 0;">
-        <div class="kpi-label">Sectioned LD &amp; Screening Group</div>
-        <div class="kpi-value">{{ ld_summary.total_sectioned }}</div>
-        <div class="kpi-sub">Out of {{ ld_summary.cohort_total }} enrolled students</div>
-    </div>
-    <div class="card kpi-card" style="background: #F3EEFF; margin-bottom: 0;">
-        <div class="kpi-label">Priority Support Marked</div>
-        <div class="kpi-value" style="color: #991B1B;">{{ ld_summary.priority_count }}</div>
-        <div class="kpi-sub">{{ ld_summary.confirmed_count }} confirmed support profiles</div>
-    </div>
-    <div class="card kpi-card" style="background: #FFF7E6; margin-bottom: 0;">
-        <div class="kpi-label">Monitoring Watchlist</div>
-        <div class="kpi-value" style="color: #92400E;">{{ ld_summary.monitoring_priority_count }}</div>
-        <div class="kpi-sub">{{ ld_summary.possibility_count }} early screening possibilities</div>
-    </div>
-    <div class="card kpi-card" style="background: #E8F7F6; margin-bottom: 0;">
-        <div class="kpi-label">Pending Messages &amp; Referrals</div>
-        <div class="kpi-value" style="{% if pending_count > 0 %}color: #991B1B;{% endif %}">{{ pending_count }}</div>
-        <div class="kpi-sub">{{ exercises|length }} active study exercises live</div>
-    </div>
-</div>
-
-<!-- Simple 3-Way Workflow Explainer -->
-<div class="card" style="margin-bottom: 2rem;">
-    <div class="card-title">
-        <span>How Students, Parents, and Teachers Connect With the Counselor</span>
-        <span class="role-badge-tag" style="background: #F8E7CD; color: #01463C;">Simple Collaboration Guide</span>
-    </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
-        <div style="background: #F3EEFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.2rem;">
-            <span class="role-badge-tag" style="background: #9B74FF; color: #01463C; margin-bottom: 0.4rem;">1. Student Portal</span>
-            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">Safe Check-In &amp; Exercises</h4>
-            <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin: 0;">
-                Students send a quick check-in whenever words blur or tests feel overwhelming, practice step-by-step counselor exercises, and click "Mark Practiced Today".
-            </p>
-        </div>
-        <div style="background: #FFF7E6; border: 2px solid #01463C; border-radius: 18px; padding: 1.2rem;">
-            <span class="role-badge-tag" style="background: #F0AF00; color: #01463C; margin-bottom: 0.4rem;">2. Parent Portal</span>
-            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">Home Support &amp; Appointments</h4>
-            <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin: 0;">
-                Parents see plain-English explanations of their child's learning profile, book counselor review talks, and follow 10-minute Home Tips daily.
-            </p>
-        </div>
-        <div style="background: #E8F7F6; border: 2px solid #01463C; border-radius: 18px; padding: 1.2rem;">
-            <span class="role-badge-tag" style="background: #1EACB0; color: #FFFFFF; margin-bottom: 0.4rem;">3. Classroom Teacher</span>
-            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.35rem;">Early Referral &amp; Classroom Updates</h4>
-            <p style="font-size: 0.88rem; color: #1F5F55; line-height: 1.5; margin: 0;">
-                Teachers filter sectioned LD/Possibility learners in class, send classroom observations, and adopt updated counselor techniques in daily lessons.
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- SECTION 1: LEARNING DISABILITY & PRIORITY / MONITORING STUDENT ROSTER -->
-<div class="card" id="ld-roster" style="margin-bottom: 2.25rem;">
-    <div class="card-title">
-        <span>Learning Disability &amp; Screening Roster &mdash; Priority &amp; Monitoring Triage</span>
-        <span style="font-size: 0.88rem; font-weight: 700; color: #1F5F55;">
-            Showing {{ screened_students|length }} {% if current_scope == 'all' or current_search or current_priority == 'Not Priority' %}matching{% else %}sectioned &amp; tracked{% endif %} learners
-        </span>
-    </div>
-
-    <!-- Filter Bar Row 1: Support Section & Search -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.85rem;">
-        <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
-            <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority=current_priority, scope=current_scope, search=current_search) }}#ld-roster"
-               class="btn btn-secondary {% if current_ld_status == 'ALL' %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.9rem;">
-                All Sectioned ({{ ld_summary.total_sectioned }})
-            </a>
-            {% for st in ld_statuses %}
-            <a href="{{ url_for('counselor_dashboard', ld_status=st, ld_category=current_ld_category, priority=current_priority, scope=current_scope, search=current_search) }}#ld-roster"
-               class="btn btn-secondary {% if current_ld_status == st %}active{% endif %}"
-               style="font-size: 0.82rem; padding: 0.4rem 0.9rem;">
-                {{ st }}
-            </a>
-            {% endfor %}
-        </div>
-
-        <form method="GET" action="{{ url_for('counselor_dashboard') }}#ld-roster" style="display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center;">
-            <input type="hidden" name="ld_status" value="{{ current_ld_status }}">
-            <input type="hidden" name="priority" value="{{ current_priority }}">
-            <input type="hidden" name="scope" value="{{ current_scope }}">
-            <select name="ld_category" aria-label="Filter by Focus Category"
-                    style="padding: 0.42rem 0.9rem; border: 2px solid #01463C; border-radius: 9999px; background: #FFFFFF; color: #01463C; font-weight: 700; font-size: 0.84rem; font-family: inherit;">
-                <option value="ALL" {% if current_ld_category == 'ALL' %}selected{% endif %}>All Focus Categories</option>
-                {% for cat in ld_categories %}
-                <option value="{{ cat }}" {% if current_ld_category == cat %}selected{% endif %}>{{ cat }}</option>
-                {% endfor %}
-            </select>
-            <input type="text" name="search" value="{{ current_search }}" placeholder="Search any of 300 students or ID..."
-                   style="padding: 0.42rem 1rem; border: 2px solid #01463C; border-radius: 9999px; background: #FFFFFF; color: #01463C; font-size: 0.86rem; font-family: inherit;">
-            <button type="submit" class="btn btn-primary" style="padding: 0.42rem 1rem; font-size: 0.84rem;">Find Student</button>
-        </form>
-    </div>
-
-    <!-- Filter Bar Row 2: Priority / Monitoring / Not Priority & All-300 Cohort Switch -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem; background: #FDF7EF; border: 2px solid #01463C; border-radius: 16px; padding: 0.7rem 1rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-            <span style="font-size: 0.8rem; font-weight: 800; color: #01463C; text-transform: uppercase; letter-spacing: 0.04em; margin-right: 0.25rem;">
-                Counselor Triage Filter:
-            </span>
-            <a href="{{ url_for('counselor_dashboard', ld_status=current_ld_status, ld_category=current_ld_category, priority='ALL', scope='sectioned', search=current_search) }}#ld-roster"
-               class="btn btn-secondary {% if current_priority == 'ALL' and current_scope != 'all' %}active{% endif %}"
-               style="font-size: 0.78rem; padding: 0.32rem 0.8rem;">
-                All Priority Levels
-            </a>
-            <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority='Priority', scope=current_scope, search=current_search) }}#ld-roster"
-               class="btn btn-secondary {% if current_priority == 'Priority' %}active{% endif %}"
-               style="font-size: 0.78rem; padding: 0.32rem 0.8rem; color: #991B1B; background: #FEF2F2;">
-                <span class="status-dot status-priority-dot"></span> Priority ({{ ld_summary.priority_count }})
-            </a>
-            <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority='Monitoring', scope=current_scope, search=current_search) }}#ld-roster"
-               class="btn btn-secondary {% if current_priority == 'Monitoring' %}active{% endif %}"
-               style="font-size: 0.78rem; padding: 0.32rem 0.8rem; color: #92400E; background: #FFF7E6;">
-                <span class="status-dot status-guided-dot"></span> Monitoring ({{ ld_summary.monitoring_priority_count }})
-            </a>
-            <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority='Not Priority', scope='all', search=current_search) }}#ld-roster"
-               class="btn btn-secondary {% if current_priority == 'Not Priority' %}active{% endif %}"
-               style="font-size: 0.78rem; padding: 0.32rem 0.8rem; color: #065F46; background: #E8F7F6;">
-                <span class="status-dot status-ontrack-dot"></span> Not Priority ({{ ld_summary.not_priority_count }})
-            </a>
-        </div>
-        <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category='ALL', priority='ALL', scope='all' if current_scope != 'all' else 'sectioned', search=current_search) }}#ld-roster"
-           class="btn {% if current_scope == 'all' %}btn-doorbell{% else %}btn-secondary{% endif %}"
-           style="font-size: 0.78rem; padding: 0.34rem 0.9rem;">
-            {% if current_scope == 'all' %}
-                Back to Active Triage View
-            {% else %}
-                Browse All {{ ld_summary.cohort_total }} Students to Mark Priority
-            {% endif %}
-        </a>
-    </div>
-
-    <!-- Roster Table -->
-    <div class="table-responsive" style="margin-bottom: 1.5rem;">
-        <table class="data-table" aria-label="Sectioned Learning Disability and Screening Students">
-            <thead>
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Student Name</th>
-                    <th scope="col">Grade / Teacher</th>
-                    <th scope="col">Mark Priority / Monitoring</th>
-                    <th scope="col">Support Section</th>
-                    <th scope="col">Learning Focus</th>
-                    <th scope="col">Observation &amp; Care Plan</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for s in screened_students %}
-                {% set cur_prio = s.counselor_priority or 'Not Priority' %}
-                <tr>
-                    <td style="font-family: monospace; font-weight: 700; font-size: 0.85rem;">{{ s.student_id }}</td>
-                    <td style="font-weight: 800; color: #01463C;">
-                        {{ s.name }}
-                        {% if s.counselor_referred %}
-                        <span class="role-badge-tag" style="background: #F3EEFF; color: #01463C; margin-left: 0.35rem; font-size: 0.72rem;">Referred</span>
-                        {% endif %}
-                    </td>
-                    <td>Class {{ s.grade }}-{{ s.section }}<br><span style="font-size: 0.78rem; color: #537D75;">{{ s.teacher_id }}</span></td>
-                    <td style="min-width: 235px;">
-                        <div style="margin-bottom: 0.4rem;">
-                            {% if cur_prio == 'Priority' %}
-                                <span class="badge-support badge-priority">Priority</span>
-                            {% elif cur_prio == 'Monitoring' %}
-                                <span class="badge-support badge-guided">Monitoring</span>
-                            {% else %}
-                                <span class="badge-support badge-ontrack">Not Priority</span>
-                            {% endif %}
-                        </div>
-                        <form method="POST" action="{{ url_for('counselor_set_priority') }}" style="display: flex; gap: 0.3rem; flex-wrap: wrap;">
-                            <input type="hidden" name="student_id" value="{{ s.student_id }}">
-                            <input type="hidden" name="ld_status" value="{{ current_ld_status }}">
-                            <input type="hidden" name="ld_category" value="{{ current_ld_category }}">
-                            <input type="hidden" name="priority" value="{{ current_priority }}">
-                            <input type="hidden" name="scope" value="{{ current_scope }}">
-                            <input type="hidden" name="search" value="{{ current_search }}">
-                            <button type="submit" name="counselor_priority" value="Priority"
-                                    style="font-size: 0.72rem; font-weight: 800; padding: 0.22rem 0.55rem; border-radius: 9999px; cursor: pointer; font-family: inherit; border: 1.5px solid #991B1B; {% if cur_prio == 'Priority' %}background: #DC2626; color: #FFFFFF;{% else %}background: #FEF2F2; color: #991B1B;{% endif %}">
-                                Priority
-                            </button>
-                            <button type="submit" name="counselor_priority" value="Monitoring"
-                                    style="font-size: 0.72rem; font-weight: 800; padding: 0.22rem 0.55rem; border-radius: 9999px; cursor: pointer; font-family: inherit; border: 1.5px solid #92400E; {% if cur_prio == 'Monitoring' %}background: #D97706; color: #FFFFFF;{% else %}background: #FFF7E6; color: #92400E;{% endif %}">
-                                Monitoring
-                            </button>
-                            <button type="submit" name="counselor_priority" value="Not Priority"
-                                    style="font-size: 0.72rem; font-weight: 800; padding: 0.22rem 0.55rem; border-radius: 9999px; cursor: pointer; font-family: inherit; border: 1.5px solid #01463C; {% if cur_prio == 'Not Priority' %}background: #01463C; color: #FDF7EF;{% else %}background: #E8F7F6; color: #01463C;{% endif %}">
-                                Not Priority
-                            </button>
-                        </form>
-                    </td>
-                    <td>
-                        {% if s.ld_screening_status == 'Confirmed Support Profile' %}
-                            <span class="badge-support badge-priority">{{ s.ld_screening_status }}</span>
-                        {% elif s.ld_screening_status == 'Possibility / Early Screening' %}
-                            <span class="badge-support badge-guided">{{ s.ld_screening_status }}</span>
-                        {% elif s.ld_screening_status and s.ld_screening_status != 'None' %}
-                            <span class="badge-support badge-ontrack">{{ s.ld_screening_status }}</span>
-                        {% else %}
-                            <span class="role-badge-tag" style="background: #FDF7EF; color: #537D75;">No LD Section</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C;">{{ s.ld_category if s.ld_category and s.ld_category != 'None' else 'General' }}</span>
-                    </td>
-                    <td style="font-size: 0.86rem; color: #1F5F55; max-width: 280px; line-height: 1.45;">
-                        {{ s.ld_notes or 'Visual & unhurried step practice recommended.' }}
-                    </td>
-                    <td>
-                        <a href="{{ url_for('student_detail', student_id=s.student_id) }}" class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.82rem;">
-                            View Dossier
-                        </a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 1.75rem; color: #537D75;">
-                        No students match this filter. Click "Browse All {{ ld_summary.cohort_total }} Students" above to view and mark any learner.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Add / Update Student Screening & Priority Status -->
-    <details style="background: #F8E7CD; border: 2px solid #01463C; border-radius: 18px; padding: 1rem 1.25rem;">
-        <summary style="cursor: pointer; font-weight: 800; color: #01463C; font-size: 0.96rem;">
-            + Mark Any Student Priority / Monitoring or Update Learning Support Profile
-        </summary>
-        <form method="POST" action="{{ url_for('counselor_update_student_ld') }}" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.9rem;">
-            <div>
-                <label for="ld-sid" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.3rem;">Select Student (All {{ all_students|length }})</label>
-                <select id="ld-sid" name="student_id" required style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                    {% for stu in all_students %}
-                    <option value="{{ stu.student_id }}">{{ stu.student_id }} — {{ stu.name }} (Class {{ stu.grade }}-{{ stu.section }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="ld-prio" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.3rem;">Counselor Priority / Monitoring</label>
-                <select id="ld-prio" name="counselor_priority" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-weight: 700;">
-                    {% for pr in counselor_priorities %}
-                    <option value="{{ pr }}">{{ pr }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="ld-stat" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.3rem;">Support Section Status</label>
-                <select id="ld-stat" name="ld_screening_status" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                    {% for st in ld_statuses %}
-                    <option value="{{ st }}">{{ st }}</option>
-                    {% endfor %}
-                    <option value="None">Clear / Remove LD Section Flag</option>
-                </select>
-            </div>
-            <div>
-                <label for="ld-cat" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.3rem;">Learning Focus Category</label>
-                <select id="ld-cat" name="ld_category" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                    {% for cat in ld_categories %}
-                    <option value="{{ cat }}">{{ cat }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div style="grid-column: 1 / -1;">
-                <label for="ld-notes" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.3rem;">Simple Observation &amp; Support Note (Visible to Teacher &amp; Parent)</label>
-                <textarea id="ld-notes" name="ld_notes" rows="2" placeholder="Write gentle, practical observations in plain language..."
-                          style="width: 100%; padding: 0.6rem 0.9rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;"></textarea>
-            </div>
-            <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-                <label style="display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 700; color: #01463C;">
-                    <input type="checkbox" name="counselor_referred" value="1" checked> Mark as Active Counselor Follow-Up
-                </label>
-                <button type="submit" class="btn btn-doorbell" style="padding: 0.55rem 1.4rem;">Save Student Support Profile</button>
-            </div>
-        </form>
-    </details>
-</div>
-
-<!-- SECTION 2: MULTI-ROLE COUNSELOR INBOX (STUDENT / PARENT / TEACHER) -->
-<div class="card" id="counselor-inbox" style="margin-bottom: 2.25rem;">
-    <div class="card-title">
-        <span>3-Way Support Inbox: Students, Parents &amp; Teachers</span>
-        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-            {% for r_key, r_label in [('ALL', 'All Roles'), ('student', 'Students'), ('parent', 'Parents'), ('teacher', 'Teachers')] %}
-            <a href="{{ url_for('counselor_dashboard', msg_role=r_key, ld_status=current_ld_status, ld_category=current_ld_category) }}#counselor-inbox"
-               class="btn btn-secondary {% if current_msg_role|lower == r_key|lower %}active{% endif %}"
-               style="font-size: 0.8rem; padding: 0.35rem 0.85rem;">
-                {{ r_label }}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.25rem;">
-        {% for m in messages %}
-        <div style="background: {% if m.status == 'Pending' %}#FFF7E6{% else %}#FFFFFF{% endif %}; border: 2px solid #01463C; border-radius: 20px; padding: 1.25rem; box-shadow: 0 3px 0 #01463C;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.65rem; flex-wrap: wrap;">
-                <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
-                    <span class="role-badge-tag" style="background: {% if m.sender_role == 'student' %}#9B74FF{% elif m.sender_role == 'parent' %}#F0AF00{% else %}#1EACB0; color: #FFFFFF{% endif %};">
-                        {{ m.sender_role|title }}
-                    </span>
-                    <span class="role-badge-tag" style="background: #F8E7CD; color: #01463C;">
-                        {{ m.request_type }}
-                    </span>
-                </div>
-                <span class="badge-support {% if m.status == 'Replied' %}badge-ontrack{% else %}badge-guided{% endif %}">
-                    {{ m.status }}
+<div style="margin: 0 auto; width: 100%;">
+    <!-- Counselor Welcome Strip -->
+    <div class="counselor-welcome-strip">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; border: 1px solid #A7F3D0; font-size: 0.72rem; font-weight: 800;">
+                    School Counselor &amp; Inclusion Hub
                 </span>
             </div>
-
-            <div style="font-size: 0.84rem; color: #537D75; font-weight: 700; margin-bottom: 0.3rem;">
-                From: {{ m.sender_name }} &bull; Student: {{ m.student_name or m.student_id }} ({{ m.student_id }})
-                {% if m.ld_category %}&bull; Focus: {{ m.ld_category }}{% endif %}
-            </div>
-            <h4 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin-bottom: 0.45rem;">{{ m.subject }}</h4>
-            <p id="cmsg-{{ m.id }}" style="font-size: 0.92rem; color: #1F5F55; line-height: 1.55; background: #FDF7EF; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.75rem 0.95rem; margin-bottom: 0.75rem;">
-                {{ m.message }}
+            <h2 class="counselor-welcome-title">
+                {{ session.get('user', {}).get('full_name', 'Dr. Meera Deshmukh (School Counselor)') }}
+            </h2>
+            <p class="counselor-welcome-sub">
+                Gentle, non-stigmatizing care hub &bull; Early screening triage, 3-way support inbox, and targeted study techniques.
             </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+            <a href="#ld-roster" class="btn btn-secondary btn-sm-pill">LD Support Roster</a>
+            <a href="#counselor-inbox" class="btn btn-secondary btn-sm-pill">
+                Support Inbox
+                {% if pending_count > 0 %}
+                <span style="background: #DC2626; color: #FFFFFF; font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 9999px; margin-left: 4px;">{{ pending_count }}</span>
+                {% endif %}
+            </a>
+            <a href="#exercise-publisher" class="btn btn-primary btn-sm-pill">+ Publish Study Exercise</a>
+        </div>
+    </div>
 
-            {% if m.reply %}
-            <div style="background: #E8F7F6; border: 1.5px solid #01463C; border-radius: 12px; padding: 0.75rem 0.95rem; margin-bottom: 0.75rem;">
-                <div style="font-size: 0.78rem; font-weight: 800; color: #01463C; text-transform: uppercase; margin-bottom: 0.25rem;">
-                    Counselor Guidance Sent:
-                </div>
-                <div style="font-size: 0.9rem; color: #01463C; line-height: 1.5;">{{ m.reply }}</div>
+    <!-- KPI Summary Strip (4 Cards) -->
+    <div class="counselor-kpi-grid-4">
+        <div class="counselor-kpi-card">
+            <div class="counselor-kpi-label">Sectioned LD &amp; Screening</div>
+            <div class="counselor-kpi-value">{{ ld_summary.total_sectioned }}</div>
+            <div class="counselor-kpi-sub">Out of {{ ld_summary.cohort_total }} enrolled students</div>
+        </div>
+        <div class="counselor-kpi-card">
+            <div class="counselor-kpi-label">Priority Support Marked</div>
+            <div class="counselor-kpi-value" style="color: #DC2626;">{{ ld_summary.priority_count }}</div>
+            <div class="counselor-kpi-sub">{{ ld_summary.confirmed_count }} confirmed support profiles</div>
+        </div>
+        <div class="counselor-kpi-card">
+            <div class="counselor-kpi-label">Monitoring Watchlist</div>
+            <div class="counselor-kpi-value" style="color: #D97706;">{{ ld_summary.monitoring_priority_count }}</div>
+            <div class="counselor-kpi-sub">{{ ld_summary.possibility_count }} early screening possibilities</div>
+        </div>
+        <div class="counselor-kpi-card">
+            <div class="counselor-kpi-label">Pending Messages &amp; Referrals</div>
+            <div class="counselor-kpi-value" style="{% if pending_count > 0 %}color: #DC2626;{% else %}color: #059669;{% endif %}">{{ pending_count }}</div>
+            <div class="counselor-kpi-sub">{{ exercises|length }} active study exercises live</div>
+        </div>
+    </div>
+
+    <!-- Simple 3-Way Workflow Explainer (Compact) -->
+    <div class="roster-card" style="margin-bottom: 1.5rem; padding: 16px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: #01463C; margin: 0 0 2px;">
+                    How Students, Parents, and Teachers Connect With the Counselor
+                </h3>
+                <p style="font-size: 0.8rem; color: #537D75; margin: 0;">
+                    Three-way collaboration workflow across portals
+                </p>
             </div>
-            {% endif %}
-
-            <form method="POST" action="{{ url_for('counselor_reply_message') }}">
-                <input type="hidden" name="message_id" value="{{ m.id }}">
-                <textarea name="reply_text" rows="2" required placeholder="{% if m.reply %}Update your guidance reply...{% else %}Write a clear, calm reply & next exercise step...{% endif %}"
-                          style="width: 100%; padding: 0.6rem 0.85rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit; font-size: 0.88rem; margin-bottom: 0.55rem;"></textarea>
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
-                    <button type="button" class="btn btn-tts tts-btn" data-target-id="cmsg-{{ m.id }}" data-lang="{{ lang }}" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
-                        Read Message
-                    </button>
-                    <button type="submit" class="btn btn-doorbell" style="font-size: 0.84rem; padding: 0.45rem 1.15rem;">
-                        {% if m.reply %}Update Reply{% else %}Send Guidance Reply{% endif %}
-                    </button>
+            <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C; border: 1px solid #A7F3D0; font-size: 0.72rem; font-weight: 700;">
+                Collaboration Guide
+            </span>
+        </div>
+        <div class="collab-guide-grid">
+            <div class="collab-guide-card">
+                <div class="collab-guide-header">
+                    <span class="collab-guide-pill" style="background: #F3EEFF; color: #6B21A8; border: 1px solid #DDD6FE;">1. Student Portal</span>
+                    <h4 class="collab-guide-title">Safe Check-In</h4>
                 </div>
+                <p class="collab-guide-desc">
+                    Students send quick check-ins whenever words blur or tests feel overwhelming, practice guided exercises, and log daily practice.
+                </p>
+            </div>
+            <div class="collab-guide-card">
+                <div class="collab-guide-header">
+                    <span class="collab-guide-pill" style="background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;">2. Parent Portal</span>
+                    <h4 class="collab-guide-title">Home Support</h4>
+                </div>
+                <p class="collab-guide-desc">
+                    Parents view clear explanations of their child's support profile, request 15-minute review talks, and follow 10-minute home tips.
+                </p>
+            </div>
+            <div class="collab-guide-card">
+                <div class="collab-guide-header">
+                    <span class="collab-guide-pill" style="background: #E8F7F6; color: #01463C; border: 1px solid #A7F3D0;">3. Classroom Teacher</span>
+                    <h4 class="collab-guide-title">Early Referral</h4>
+                </div>
+                <p class="collab-guide-desc">
+                    Teachers filter sectioned LD learners in class, share classroom observations, and apply counselor-recommended accommodations.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1: LEARNING DISABILITY & PRIORITY / MONITORING STUDENT ROSTER -->
+    <div class="roster-card" id="ld-roster" style="margin-bottom: 2rem;">
+        <div class="roster-header">
+            <div>
+                <h3 class="roster-title">Learning Disability &amp; Screening Roster</h3>
+                <p class="roster-subtitle">
+                    Showing {{ screened_students|length }} {% if current_scope == 'all' or current_search or current_priority == 'Not Priority' %}matching{% else %}sectioned &amp; tracked{% endif %} learners &bull; Priority &amp; Monitoring Triage
+                </p>
+            </div>
+            <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category='ALL', priority='ALL', scope='all' if current_scope != 'all' else 'sectioned', search=current_search) }}#ld-roster"
+               class="btn {% if current_scope == 'all' %}btn-primary{% else %}btn-secondary{% endif %} btn-sm-pill">
+                {% if current_scope == 'all' %}
+                    Back to Active Triage View
+                {% else %}
+                    Browse All {{ ld_summary.cohort_total }} Students to Mark Priority
+                {% endif %}
+            </a>
+        </div>
+
+        <!-- Unified Toolbar (Tabs + Search/Filter) -->
+        <div class="roster-toolbar">
+            <div class="roster-toolbar-pills">
+                <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority='ALL', scope='sectioned', search=current_search) }}#ld-roster"
+                   class="roster-pill {% if current_priority == 'ALL' and current_ld_status == 'ALL' and current_scope != 'all' %}active{% endif %}">
+                    All Sectioned ({{ ld_summary.total_sectioned }})
+                </a>
+                <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority='Priority', scope=current_scope, search=current_search) }}#ld-roster"
+                   class="roster-pill {% if current_priority == 'Priority' %}active{% endif %}"
+                   style="{% if current_priority == 'Priority' %}background: #DC2626; color: #FFFFFF; border-color: #DC2626;{% else %}color: #DC2626;{% endif %}">
+                    &bull; Priority ({{ ld_summary.priority_count }})
+                </a>
+                <a href="{{ url_for('counselor_dashboard', ld_status='ALL', ld_category=current_ld_category, priority='Monitoring', scope=current_scope, search=current_search) }}#ld-roster"
+                   class="roster-pill {% if current_priority == 'Monitoring' %}active{% endif %}"
+                   style="{% if current_priority == 'Monitoring' %}background: #D97706; color: #FFFFFF; border-color: #D97706;{% else %}color: #D97706;{% endif %}">
+                    &bull; Monitoring ({{ ld_summary.monitoring_priority_count }})
+                </a>
+                {% for st in ld_statuses %}
+                <a href="{{ url_for('counselor_dashboard', ld_status=st, ld_category=current_ld_category, priority=current_priority, scope=current_scope, search=current_search) }}#ld-roster"
+                   class="roster-pill {% if current_ld_status == st %}active{% endif %}">
+                    {{ st }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <form method="GET" action="{{ url_for('counselor_dashboard') }}#ld-roster" class="roster-search-form">
+                <input type="hidden" name="ld_status" value="{{ current_ld_status }}">
+                <input type="hidden" name="priority" value="{{ current_priority }}">
+                <input type="hidden" name="scope" value="{{ current_scope }}">
+                <select name="ld_category" aria-label="Filter by Focus Category" class="form-select-clean" style="width: auto; min-width: 165px; margin-bottom: 0;">
+                    <option value="ALL" {% if current_ld_category == 'ALL' %}selected{% endif %}>All Focus Categories</option>
+                    {% for cat in ld_categories %}
+                    <option value="{{ cat }}" {% if current_ld_category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" name="search" value="{{ current_search }}" placeholder="Search student name or ID..." class="form-input-clean" style="width: 210px; margin-bottom: 0;">
+                <button type="submit" class="btn btn-primary btn-sm-pill">Search</button>
+                {% if current_search or current_ld_category != 'ALL' or current_ld_status != 'ALL' or current_priority != 'ALL' %}
+                <a href="{{ url_for('counselor_dashboard') }}#ld-roster" class="btn btn-secondary btn-sm-pill">Reset</a>
+                {% endif %}
             </form>
         </div>
-        {% else %}
-        <p style="color: #537D75;">No messages in this filter yet.</p>
-        {% endfor %}
-    </div>
-</div>
 
-<!-- SECTION 3: PUBLISH STUDY TECHNIQUES & COUNSELOR UPDATED EXERCISES -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.75rem; align-items: start;" id="exercise-publisher">
-    <!-- Publisher Form -->
-    <div class="card card-sand" style="margin-bottom: 0;">
-        <div class="card-title">
-            <span>Publish Simple Study Technique / Exercise</span>
+        <!-- Roster Table -->
+        <div style="overflow-x: auto;">
+            <table class="counselor-table" aria-label="Sectioned Learning Disability and Screening Students">
+                <thead>
+                    <tr style="background: #FAF8F5;">
+                        <th scope="col" class="col-c-id">ID</th>
+                        <th scope="col" class="col-c-name">Student &amp; Class</th>
+                        <th scope="col" class="col-c-triage">Triage Level</th>
+                        <th scope="col" class="col-c-section">Support Section</th>
+                        <th scope="col" class="col-c-focus">Learning Focus</th>
+                        <th scope="col" class="col-c-notes">Observation Note</th>
+                        <th scope="col" class="col-c-action">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in screened_students %}
+                    {% set cur_prio = s.counselor_priority or 'Not Priority' %}
+                    <tr>
+                        <td class="col-c-id">
+                            <span style="font-family: monospace; font-weight: 700; font-size: 0.82rem; color: #537D75;">{{ s.student_id }}</span>
+                        </td>
+                        <td class="col-c-name">
+                            <div style="font-weight: 800; color: #01463C; font-size: 0.9rem; display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                                {{ s.name }}
+                                {% if s.counselor_referred %}
+                                <span class="role-badge-tag" style="background: #F3EEFF; color: #6B21A8; border: 1px solid #DDD6FE; font-size: 0.68rem; padding: 1px 6px;">Referred</span>
+                                {% endif %}
+                            </div>
+                            <div class="counselor-student-meta">Class {{ s.grade }}-{{ s.section }} &bull; {{ s.teacher_id }}</div>
+                        </td>
+                        <td class="col-c-triage">
+                            <form method="POST" action="{{ url_for('counselor_set_priority') }}" style="margin: 0;">
+                                <input type="hidden" name="student_id" value="{{ s.student_id }}">
+                                <input type="hidden" name="ld_status" value="{{ current_ld_status }}">
+                                <input type="hidden" name="ld_category" value="{{ current_ld_category }}">
+                                <input type="hidden" name="priority" value="{{ current_priority }}">
+                                <input type="hidden" name="scope" value="{{ current_scope }}">
+                                <input type="hidden" name="search" value="{{ current_search }}">
+                                <div class="counselor-seg-group">
+                                    <button type="submit" name="counselor_priority" value="Priority"
+                                            class="counselor-seg-btn {% if cur_prio == 'Priority' %}active-priority{% endif %}"
+                                            title="Mark Priority Support">
+                                        Priority
+                                    </button>
+                                    <button type="submit" name="counselor_priority" value="Monitoring"
+                                            class="counselor-seg-btn {% if cur_prio == 'Monitoring' %}active-monitoring{% endif %}"
+                                            title="Mark Monitoring Watchlist">
+                                        Monitoring
+                                    </button>
+                                    <button type="submit" name="counselor_priority" value="Not Priority"
+                                            class="counselor-seg-btn {% if cur_prio == 'Not Priority' %}active-not-priority{% endif %}"
+                                            title="Mark Not Priority">
+                                        Not Priority
+                                    </button>
+                                </div>
+                            </form>
+                        </td>
+                        <td class="col-c-section">
+                            {% if s.ld_screening_status == 'Confirmed Support Profile' %}
+                                <span class="table-status-pill pill-priority">{{ s.ld_screening_status }}</span>
+                            {% elif s.ld_screening_status == 'Possibility / Early Screening' %}
+                                <span class="table-status-pill pill-guided">{{ s.ld_screening_status }}</span>
+                            {% elif s.ld_screening_status and s.ld_screening_status != 'None' %}
+                                <span class="table-status-pill pill-ontrack">{{ s.ld_screening_status }}</span>
+                            {% else %}
+                                <span style="font-size: 0.74rem; color: #9CA3AF;">None</span>
+                            {% endif %}
+                        </td>
+                        <td class="col-c-focus">
+                            <span class="paper-subject-pill" style="font-size: 0.72rem; margin-bottom: 0;">
+                                {{ s.ld_category if s.ld_category and s.ld_category != 'None' else 'General' }}
+                            </span>
+                        </td>
+                        <td class="col-c-notes">
+                            <div class="counselor-note-clamp" title="{{ s.ld_notes or 'Visual & unhurried step practice recommended.' }}">
+                                {{ s.ld_notes or 'Visual & unhurried step practice recommended.' }}
+                            </div>
+                        </td>
+                        <td class="col-c-action">
+                            <a href="{{ url_for('student_detail', student_id=s.student_id) }}" class="btn btn-secondary btn-sm-pill" style="font-size: 0.72rem; padding: 3px 8px; white-space: nowrap;">
+                                Dossier
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: #537D75;">
+                            No students match this filter. Click "Browse All {{ ld_summary.cohort_total }} Students" above to view and mark any learner.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <p style="font-size: 0.9rem; color: #1F5F55; margin-bottom: 1.15rem; line-height: 1.55;">
-            Exercises published here automatically appear inside the Student Portal, Parent Portal, Teacher Dashboard, and both AI Chatbots so families stay updated every week.
-        </p>
 
-        <form method="POST" action="{{ url_for('counselor_add_exercise') }}">
-            <div style="margin-bottom: 0.85rem;">
-                <label for="ex-title" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Exercise Title (Short &amp; Friendly)</label>
-                <input type="text" id="ex-title" name="title" required placeholder="e.g., Triangle Number Corners for Times Tables"
-                       style="width: 100%; padding: 0.6rem 0.9rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+        <!-- Add / Update Student Screening & Priority Status (Clean Accordion) -->
+        <details style="margin-top: 1.25rem; background: #FAF8F5; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 12px 16px;">
+            <summary style="cursor: pointer; font-weight: 800; color: #01463C; font-size: 0.9rem;">
+                + Mark Any Student Priority / Monitoring or Update Learning Support Profile
+            </summary>
+            <form method="POST" action="{{ url_for('counselor_update_student_ld') }}" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem;">
                 <div>
-                    <label for="ex-cat" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Target Support Group</label>
-                    <select id="ex-cat" name="target_category" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                        <option value="All LD & Focus Learners">All LD &amp; Focus Learners</option>
+                    <label for="ld-sid" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Select Student (All {{ all_students|length }})</label>
+                    <select id="ld-sid" name="student_id" required class="form-select-clean">
+                        {% for stu in all_students %}
+                        <option value="{{ stu.student_id }}">{{ stu.student_id }} &mdash; {{ stu.name }} (Class {{ stu.grade }}-{{ stu.section }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="ld-prio" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Counselor Triage</label>
+                    <select id="ld-prio" name="counselor_priority" class="form-select-clean" style="font-weight: 700;">
+                        {% for pr in counselor_priorities %}
+                        <option value="{{ pr }}">{{ pr }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="ld-stat" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Support Section Status</label>
+                    <select id="ld-stat" name="ld_screening_status" class="form-select-clean">
+                        {% for st in ld_statuses %}
+                        <option value="{{ st }}">{{ st }}</option>
+                        {% endfor %}
+                        <option value="None">Clear / Remove LD Section Flag</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="ld-cat" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Learning Focus Category</label>
+                    <select id="ld-cat" name="ld_category" class="form-select-clean">
                         {% for cat in ld_categories %}
                         <option value="{{ cat }}">{{ cat }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div>
-                    <label for="ex-dur" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Time Needed (Minutes)</label>
-                    <input type="number" id="ex-dur" name="duration_mins" value="10" min="5" max="30"
-                           style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
+                <div style="grid-column: 1 / -1;">
+                    <label for="ld-notes" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Simple Observation &amp; Support Note (Visible to Teacher &amp; Parent)</label>
+                    <textarea id="ld-notes" name="ld_notes" rows="2" placeholder="Write gentle, practical observations in plain language..." class="form-textarea-clean" style="margin-bottom: 0;"></textarea>
                 </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
-                <div>
-                    <label for="ex-tech" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Study Technique Name</label>
-                    <input type="text" id="ex-tech" name="study_technique" required placeholder="e.g., Visual Corner Pairing"
-                           style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
+                <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem;">
+                    <label style="display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.84rem; font-weight: 700; color: #01463C; cursor: pointer;">
+                        <input type="checkbox" name="counselor_referred" value="1" checked> Mark as Active Counselor Follow-Up
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-sm-pill">Save Student Support Profile</button>
                 </div>
-                <div>
-                    <label for="ex-diff" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Level</label>
-                    <select id="ex-diff" name="difficulty_level" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                        <option value="Gentle Starter">Gentle Starter</option>
-                        <option value="Step-Up Practice">Step-Up Practice</option>
-                        <option value="Exam Confidence">Exam Confidence</option>
-                    </select>
-                </div>
-            </div>
-
-            <input type="hidden" name="target_audience" value="Students, Parents & Teachers">
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
-                <div>
-                    <label for="ex-assign" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Assign To Student (Or Group)</label>
-                    <select id="ex-assign" name="assigned_student_id" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                        <option value="ALL">All Matching Learners (Whole Support Group)</option>
-                        {% for stu in screened_students[:30] %}
-                        <option value="{{ stu.student_id }}">{{ stu.student_id }} &mdash; {{ stu.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label for="ex-tool" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Online Interactive Mini-Lab</label>
-                    <select id="ex-tool" name="interactive_tool" style="width: 100%; padding: 0.55rem 0.8rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-                        {% for t_key, t_info in interactive_tools.items() %}
-                        <option value="{{ t_key }}">{{ t_info.label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 0.85rem;">
-                <label for="ex-goal" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Simple Goal (1 Easy Sentence)</label>
-                <input type="text" id="ex-goal" name="simple_goal" required placeholder="Explain in plain words how this exercise helps the child..."
-                       style="width: 100%; padding: 0.6rem 0.9rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-            </div>
-
-            <div style="margin-bottom: 0.85rem;">
-                <label for="ex-steps" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Easy Step-by-Step Instructions (One Step Per Line)</label>
-                <textarea id="ex-steps" name="steps_raw" rows="3" required placeholder="Step 1: Read one sentence slowly with a finger underneath.&#10;Step 2: Circle numbers in green pencil.&#10;Step 3: Draw a quick box before solving."
-                          style="width: 100%; padding: 0.65rem 0.9rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;"></textarea>
-            </div>
-
-            <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 14px; padding: 0.85rem; margin-bottom: 0.85rem;">
-                <div style="font-size: 0.82rem; font-weight: 800; color: #01463C; margin-bottom: 0.45rem;">
-                    Optional External Interactive Site &amp; Parent Research Reference:
-                </div>
-                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
-                    <button type="button" class="btn btn-secondary ex-ref-preset" style="font-size: 0.74rem; padding: 0.25rem 0.6rem;"
-                            data-ext-name="Math Learning Center Fractions App" data-ext-url="https://apps.mathlearningcenter.org/fractions"
-                            data-ref-name="The Math Learning Center" data-ref-url="https://www.mathlearningcenter.org/apps"
-                            data-ref-sum="Free browser-based visual fraction strips used for Concrete-Representational-Abstract practice.">+ MLC Fractions</button>
-                    <button type="button" class="btn btn-secondary ex-ref-preset" style="font-size: 0.74rem; padding: 0.25rem 0.6rem;"
-                            data-ext-name="PhET Equality Explorer" data-ext-url="https://phet.colorado.edu/sims/html/equality-explorer/latest/equality-explorer_en.html"
-                            data-ref-name="PhET Interactive Simulations (CU Boulder)" data-ref-url="https://phet.colorado.edu/sims/html/equality-explorer/latest/equality-explorer_en.html"
-                            data-ref-sum="University of Colorado Boulder visual balance simulation for learning algebra without sign errors.">+ PhET Algebra</button>
-                    <button type="button" class="btn btn-secondary ex-ref-preset" style="font-size: 0.74rem; padding: 0.25rem 0.6rem;"
-                            data-ext-name="Khan Academy Interactive Math" data-ext-url="https://www.khanacademy.org/"
-                            data-ref-name="Understood.org &amp; Reading Rockets" data-ref-url="https://www.understood.org/"
-                            data-ref-sum="Self-paced unhurried step practice informed by Understood.org dyslexia/dyscalculia guides.">+ Understood + Khan</button>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 0.55rem;">
-                    <input type="text" id="ex-ext-name" name="external_site_name" placeholder="External Practice Site Name"
-                           style="width: 100%; padding: 0.45rem 0.7rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
-                    <input type="url" id="ex-ext-url" name="external_practice_url" placeholder="https://... (interactive practice link)"
-                           style="width: 100%; padding: 0.45rem 0.7rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 0.55rem;">
-                    <input type="text" id="ex-ref-name" name="reference_source_name" placeholder="Reference Source Name (e.g., Reading Rockets)"
-                           style="width: 100%; padding: 0.45rem 0.7rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
-                    <input type="url" id="ex-ref-url" name="reference_url" placeholder="https://... (research link for parents)"
-                           style="width: 100%; padding: 0.45rem 0.7rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
-                </div>
-                <input type="text" id="ex-ref-sum" name="reference_summary" placeholder="Short note for parents: why this source was used as reference..."
-                       style="width: 100%; padding: 0.45rem 0.7rem; border-radius: 10px; border: 1.5px solid #01463C; font-family: inherit; font-size: 0.82rem;">
-            </div>
-
-            <div style="margin-bottom: 1.15rem;">
-                <label for="ex-tip" style="display: block; font-size: 0.84rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">Simple Tip for Parents &amp; Teachers</label>
-                <input type="text" id="ex-tip" name="home_tip" required placeholder="e.g., Praise effort after 10 minutes; avoid correcting too quickly."
-                       style="width: 100%; padding: 0.6rem 0.9rem; border-radius: 12px; border: 2px solid #01463C; background: #FFFFFF; font-family: inherit;">
-            </div>
-
-            <button type="submit" class="btn btn-doorbell" style="width: 100%; padding: 0.75rem;">
-                Assign &amp; Publish Online Exercise
-            </button>
-        </form>
+            </form>
+        </details>
     </div>
 
-    <!-- Active Exercise Library -->
-    <div class="card" style="margin-bottom: 0;">
-        <div class="card-title">
-            <span>Active Study Exercises Library ({{ exercises|length }})</span>
-        </div>
-        <div style="display: grid; gap: 1rem; max-height: 820px; overflow-y: auto; padding-right: 0.25rem;">
-            {% for ex in exercises %}
-            <div style="background: #FFFFFF; border: 2px solid #01463C; border-radius: 18px; padding: 1.15rem; box-shadow: 0 3px 0 #01463C;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.45rem;">
-                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
-                        <span class="role-badge-tag" style="background: #E8F7F6; color: #01463C;">{{ ex.target_category }}</span>
-                        {% if ex.assigned_student_id and ex.assigned_student_id != 'ALL' %}
-                        <span class="role-badge-tag" style="background: #9B74FF; color: #01463C;">Assigned: {{ ex.assigned_student_id }}</span>
-                        {% endif %}
-                        <span class="role-badge-tag" style="background: #F8E7CD; color: #01463C;">{{ ex.exercise_mode or 'Online Mini-Lab' }}</span>
-                    </div>
-                    <span style="font-size: 0.78rem; font-weight: 800; color: #537D75;">{{ ex.duration_mins }} mins &bull; Practiced {{ ex.practice_count }}x</span>
-                </div>
-                <h4 style="font-size: 1.08rem; font-weight: 800; color: #01463C; margin-bottom: 0.25rem;">{{ ex.title }}</h4>
-                <div style="font-size: 0.8rem; font-weight: 700; color: #5B21B6; margin-bottom: 0.4rem;">Technique: {{ ex.study_technique }}</div>
-                <p style="font-size: 0.88rem; color: #1F5F55; margin-bottom: 0.6rem;"><strong>Goal:</strong> {{ ex.simple_goal }}</p>
-                <ol style="padding-left: 1.25rem; font-size: 0.85rem; color: #01463C; line-height: 1.5; margin-bottom: 0.6rem;">
-                    {% for st in ex.steps %}
-                    <li>{{ st }}</li>
-                    {% endfor %}
-                </ol>
-                <div style="background: #F8E7CD; border: 1.5px solid #01463C; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.82rem; color: #01463C; margin-bottom: 0.5rem;">
-                    <strong>Home / Class Tip:</strong> {{ ex.home_tip }}
-                </div>
-                {% if ex.reference_url or ex.external_practice_url %}
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; font-size: 0.78rem; padding-top: 0.35rem;">
-                    {% if ex.external_practice_url %}
-                    <a href="{{ ex.external_practice_url }}" target="_blank" rel="noopener noreferrer" style="color: #01463C; font-weight: 800; text-decoration: underline;">
-                        External App: {{ ex.external_site_name or 'Interactive Site' }} &rarr;
-                    </a>
-                    {% endif %}
-                    {% if ex.reference_url %}
-                    <a href="{{ ex.reference_url }}" target="_blank" rel="noopener noreferrer" style="color: #1F5F55; font-weight: 700; text-decoration: underline;">
-                        Ref: {{ ex.reference_source_name or ex.reference_url }} &rarr;
-                    </a>
-                    {% endif %}
-                </div>
-                {% endif %}
+    <!-- SECTION 2: MULTI-ROLE COUNSELOR INBOX (STUDENT / PARENT / TEACHER) -->
+    <div class="roster-card" id="counselor-inbox" style="margin-bottom: 2rem;">
+        <div class="roster-header">
+            <div>
+                <h3 class="roster-title">3-Way Support Inbox</h3>
+                <p class="roster-subtitle">Coordinated check-ins and referrals from Students, Parents, and Teachers</p>
             </div>
+            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                {% for r_key, r_label in [('ALL', 'All Roles'), ('student', 'Students'), ('parent', 'Parents'), ('teacher', 'Teachers')] %}
+                <a href="{{ url_for('counselor_dashboard', msg_role=r_key, ld_status=current_ld_status, ld_category=current_ld_category) }}#counselor-inbox"
+                   class="btn {% if current_msg_role|lower == r_key|lower %}btn-primary{% else %}btn-secondary{% endif %} btn-sm-pill">
+                    {{ r_label }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="inbox-grid-3col">
+            {% for m in messages %}
+            <div class="inbox-card-clean {% if m.status == 'Pending' %}is-pending{% endif %}">
+                <div>
+                    <div class="inbox-card-header">
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            {% if m.sender_role == 'student' %}
+                            <span class="inbox-role-pill-student">Student</span>
+                            {% elif m.sender_role == 'parent' %}
+                            <span class="inbox-role-pill-parent">Parent</span>
+                            {% else %}
+                            <span class="inbox-role-pill-teacher">Teacher</span>
+                            {% endif %}
+                            <span class="role-badge-tag" style="background: #F3F4F6; color: #374151; font-size: 0.7rem; padding: 2px 7px;">
+                                {{ m.request_type }}
+                            </span>
+                        </div>
+                        <span class="table-status-pill {% if m.status == 'Replied' %}pill-ontrack{% else %}pill-guided{% endif %}">
+                            {{ m.status }}
+                        </span>
+                    </div>
+
+                    <div style="font-size: 0.78rem; color: #537D75; font-weight: 600; margin-bottom: 4px;">
+                        From: <strong style="color: #01463C;">{{ m.sender_name }}</strong> &bull; Student: {{ m.student_name or m.student_id }}
+                        {% if m.ld_category %}&bull; <span style="color: #6B21A8;">{{ m.ld_category }}</span>{% endif %}
+                    </div>
+                    <h4 style="font-size: 0.98rem; font-weight: 800; color: #01463C; margin: 0 0 8px;">{{ m.subject }}</h4>
+                    
+                    <div id="cmsg-{{ m.id }}" class="inbox-msg-box">
+                        {{ m.message }}
+                    </div>
+
+                    {% if m.reply %}
+                    <div class="inbox-reply-box">
+                        <div style="font-size: 0.72rem; font-weight: 800; color: #065F46; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.03em;">
+                            Counselor Guidance Sent:
+                        </div>
+                        <div style="font-size: 0.84rem; color: #01463C; line-height: 1.45;">{{ m.reply }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 10px;">
+                    {% if m.status == 'Pending' %}
+                    <form method="POST" action="{{ url_for('counselor_reply_message') }}" style="margin: 0;">
+                        <input type="hidden" name="message_id" value="{{ m.id }}">
+                        <textarea name="reply_text" rows="2" required placeholder="Write a clear, calm reply & next exercise step..." class="form-textarea-clean" style="font-size: 0.82rem; margin-bottom: 8px;"></textarea>
+                        <div class="inbox-action-bar">
+                            <button type="button" class="btn btn-secondary btn-sm-pill tts-btn" data-target-id="cmsg-{{ m.id }}" data-lang="{{ lang }}" style="font-size: 0.74rem;">
+                                Listen
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-sm-pill">
+                                Send Guidance Reply
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <details style="margin-top: 6px;">
+                        <summary style="font-size: 0.78rem; font-weight: 700; color: #537D75; cursor: pointer; padding: 2px 0;">
+                            Update Guidance Reply &hellip;
+                        </summary>
+                        <form method="POST" action="{{ url_for('counselor_reply_message') }}" style="margin-top: 6px;">
+                            <input type="hidden" name="message_id" value="{{ m.id }}">
+                            <textarea name="reply_text" rows="2" required placeholder="Update your guidance reply..." class="form-textarea-clean" style="font-size: 0.82rem; margin-bottom: 8px;">{{ m.reply }}</textarea>
+                            <div style="text-align: right;">
+                                <button type="submit" class="btn btn-secondary btn-sm-pill" style="font-size: 0.74rem;">
+                                    Save Update
+                                </button>
+                            </div>
+                        </form>
+                    </details>
+                    <div class="inbox-action-bar" style="margin-top: 4px;">
+                        <button type="button" class="btn btn-secondary btn-sm-pill tts-btn" data-target-id="cmsg-{{ m.id }}" data-lang="{{ lang }}" style="font-size: 0.74rem;">
+                            Listen
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p style="color: #537D75; grid-column: 1 / -1; padding: 1.5rem 0; text-align: center;">No messages in this filter yet.</p>
             {% endfor %}
+        </div>
+    </div>
+
+    <!-- SECTION 3: PUBLISH STUDY TECHNIQUES & COUNSELOR UPDATED EXERCISES -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; align-items: start;" id="exercise-publisher">
+        <!-- Publisher Form Card -->
+        <div class="roster-card" style="margin-bottom: 0;">
+            <div class="roster-header">
+                <div>
+                    <h3 class="roster-title">Publish Simple Study Technique / Exercise</h3>
+                    <p class="roster-subtitle">Syncs automatically to Student Portal, Parent Portal, and Teacher Dashboard</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('counselor_add_exercise') }}">
+                <div style="margin-bottom: 0.75rem;">
+                    <label for="ex-title" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Exercise Title (Short &amp; Friendly)</label>
+                    <input type="text" id="ex-title" name="title" required placeholder="e.g., Triangle Number Corners for Times Tables" class="form-input-clean">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <label for="ex-cat" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Target Support Group</label>
+                        <select id="ex-cat" name="target_category" class="form-select-clean">
+                            <option value="All LD & Focus Learners">All LD &amp; Focus Learners</option>
+                            {% for cat in ld_categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ex-dur" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Time Needed (Mins)</label>
+                        <input type="number" id="ex-dur" name="duration_mins" value="10" min="5" max="30" class="form-input-clean">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <label for="ex-tech" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Technique Name</label>
+                        <input type="text" id="ex-tech" name="study_technique" required placeholder="e.g., Visual Corner Pairing" class="form-input-clean">
+                    </div>
+                    <div>
+                        <label for="ex-diff" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Level</label>
+                        <select id="ex-diff" name="difficulty_level" class="form-select-clean">
+                            <option value="Gentle Starter">Gentle Starter</option>
+                            <option value="Step-Up Practice">Step-Up Practice</option>
+                            <option value="Exam Confidence">Exam Confidence</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" name="target_audience" value="Students, Parents & Teachers">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <div>
+                        <label for="ex-assign" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Assign To Student (Or Group)</label>
+                        <select id="ex-assign" name="assigned_student_id" class="form-select-clean">
+                            <option value="ALL">All Matching Learners (Whole Group)</option>
+                            {% for stu in screened_students[:30] %}
+                            <option value="{{ stu.student_id }}">{{ stu.student_id }} &mdash; {{ stu.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ex-tool" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Online Mini-Lab</label>
+                        <select id="ex-tool" name="interactive_tool" class="form-select-clean">
+                            {% for t_key, t_info in interactive_tools.items() %}
+                            <option value="{{ t_key }}">{{ t_info.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 0.75rem;">
+                    <label for="ex-goal" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Simple Goal (1 Easy Sentence)</label>
+                    <input type="text" id="ex-goal" name="simple_goal" required placeholder="Explain in plain words how this exercise helps the child..." class="form-input-clean">
+                </div>
+
+                <div style="margin-bottom: 0.75rem;">
+                    <label for="ex-steps" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Step-by-Step Instructions (One Step Per Line)</label>
+                    <textarea id="ex-steps" name="steps_raw" rows="3" required placeholder="Step 1: Read one sentence slowly with a finger underneath.&#10;Step 2: Circle numbers in green pencil.&#10;Step 3: Draw a quick box before solving." class="form-textarea-clean"></textarea>
+                </div>
+
+                <!-- Collapsible Optional External Links -->
+                <details style="margin-bottom: 0.85rem; background: #FAF8F5; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 10px 14px;">
+                    <summary style="font-size: 0.8rem; font-weight: 700; color: #01463C; cursor: pointer;">
+                        + Optional External Practice Site &amp; Research Reference
+                    </summary>
+                    <div style="margin-top: 0.75rem;">
+                        <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
+                            <button type="button" class="btn btn-secondary btn-sm-pill ex-ref-preset" style="font-size: 0.72rem; padding: 2px 7px;"
+                                    data-ext-name="Math Learning Center Fractions App" data-ext-url="https://apps.mathlearningcenter.org/fractions"
+                                    data-ref-name="The Math Learning Center" data-ref-url="https://www.mathlearningcenter.org/apps"
+                                    data-ref-sum="Free browser-based visual fraction strips used for Concrete-Representational-Abstract practice.">+ MLC Fractions</button>
+                            <button type="button" class="btn btn-secondary btn-sm-pill ex-ref-preset" style="font-size: 0.72rem; padding: 2px 7px;"
+                                    data-ext-name="PhET Equality Explorer" data-ext-url="https://phet.colorado.edu/sims/html/equality-explorer/latest/equality-explorer_en.html"
+                                    data-ref-name="PhET Interactive Simulations (CU Boulder)" data-ref-url="https://phet.colorado.edu/sims/html/equality-explorer/latest/equality-explorer_en.html"
+                                    data-ref-sum="University of Colorado Boulder visual balance simulation for learning algebra without sign errors.">+ PhET Algebra</button>
+                            <button type="button" class="btn btn-secondary btn-sm-pill ex-ref-preset" style="font-size: 0.72rem; padding: 2px 7px;"
+                                    data-ext-name="Khan Academy Interactive Math" data-ext-url="https://www.khanacademy.org/"
+                                    data-ref-name="Understood.org &amp; Reading Rockets" data-ref-url="https://www.understood.org/"
+                                    data-ref-sum="Self-paced unhurried step practice informed by Understood.org dyslexia/dyscalculia guides.">+ Understood + Khan</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 0.55rem;">
+                            <input type="text" id="ex-ext-name" name="external_site_name" placeholder="Practice Site Name" class="form-input-clean" style="margin-bottom: 0; font-size: 0.8rem;">
+                            <input type="url" id="ex-ext-url" name="external_practice_url" placeholder="https://... practice URL" class="form-input-clean" style="margin-bottom: 0; font-size: 0.8rem;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 0.55rem;">
+                            <input type="text" id="ex-ref-name" name="reference_source_name" placeholder="Reference Source (e.g. Reading Rockets)" class="form-input-clean" style="margin-bottom: 0; font-size: 0.8rem;">
+                            <input type="url" id="ex-ref-url" name="reference_url" placeholder="https://... research URL" class="form-input-clean" style="margin-bottom: 0; font-size: 0.8rem;">
+                        </div>
+                        <input type="text" id="ex-ref-sum" name="reference_summary" placeholder="Short note for parents: why this source was used..." class="form-input-clean" style="margin-bottom: 0; font-size: 0.8rem;">
+                    </div>
+                </details>
+
+                <div style="margin-bottom: 1rem;">
+                    <label for="ex-tip" style="display: block; font-size: 0.8rem; font-weight: 700; color: #01463C; margin-bottom: 0.25rem;">Simple Tip for Parents &amp; Teachers</label>
+                    <input type="text" id="ex-tip" name="home_tip" required placeholder="e.g., Praise effort after 10 minutes; avoid correcting too quickly." class="form-input-clean">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.65rem; border-radius: 9999px; font-weight: 700;">
+                    Assign &amp; Publish Online Exercise
+                </button>
+            </form>
+        </div>
+
+        <!-- Active Exercise Library Card -->
+        <div class="roster-card" style="margin-bottom: 0;">
+            <div class="roster-header">
+                <div>
+                    <h3 class="roster-title">Active Study Exercises ({{ exercises|length }})</h3>
+                    <p class="roster-subtitle">Standardized 10-minute techniques available across portals</p>
+                </div>
+            </div>
+
+            <div class="exercise-library-scroll">
+                {% for ex in exercises %}
+                <div class="exercise-item-clean">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.4rem;">
+                        <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center;">
+                            <span class="paper-subject-pill" style="font-size: 0.7rem; margin-bottom: 0;">{{ ex.target_category }}</span>
+                            {% if ex.assigned_student_id and ex.assigned_student_id != 'ALL' %}
+                            <span class="role-badge-tag" style="background: #F3EEFF; color: #6B21A8; border: 1px solid #DDD6FE; font-size: 0.68rem; padding: 1px 6px;">
+                                Assigned: {{ ex.assigned_student_id }}
+                            </span>
+                            {% endif %}
+                            <span class="role-badge-tag" style="background: #F3F4F6; color: #374151; font-size: 0.68rem; padding: 1px 6px;">
+                                {{ ex.exercise_mode or 'Online Mini-Lab' }}
+                            </span>
+                        </div>
+                        <span style="font-size: 0.74rem; font-weight: 700; color: #537D75;">
+                            {{ ex.duration_mins }} mins &bull; Practiced {{ ex.practice_count }}x
+                        </span>
+                    </div>
+
+                    <h4 style="font-size: 1rem; font-weight: 800; color: #01463C; margin: 0 0 2px;">{{ ex.title }}</h4>
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #6B21A8; margin-bottom: 6px;">
+                        Technique: {{ ex.study_technique }}
+                    </div>
+                    <p style="font-size: 0.83rem; color: #1F5F55; margin-bottom: 8px; line-height: 1.4;">
+                        <strong>Goal:</strong> {{ ex.simple_goal }}
+                    </p>
+
+                    <ol style="padding-left: 1.25rem; font-size: 0.8rem; color: #01463C; line-height: 1.45; margin: 0 0 8px;">
+                        {% for st in ex.steps %}
+                        <li>{{ st }}</li>
+                        {% endfor %}
+                    </ol>
+
+                    <div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 6px 10px; font-size: 0.78rem; color: #92400E; margin-bottom: 6px;">
+                        <strong>Home / Class Tip:</strong> {{ ex.home_tip }}
+                    </div>
+
+                    {% if ex.reference_url or ex.external_practice_url %}
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; font-size: 0.74rem; padding-top: 4px;">
+                        {% if ex.external_practice_url %}
+                        <a href="{{ ex.external_practice_url }}" target="_blank" rel="noopener noreferrer" style="color: #01463C; font-weight: 700; text-decoration: underline;">
+                            External App: {{ ex.external_site_name or 'Interactive Site' }} &rarr;
+                        </a>
+                        {% endif %}
+                        {% if ex.reference_url %}
+                        <a href="{{ ex.reference_url }}" target="_blank" rel="noopener noreferrer" style="color: #537D75; font-weight: 600; text-decoration: underline;">
+                            Ref: {{ ex.reference_source_name or ex.reference_url }} &rarr;
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>

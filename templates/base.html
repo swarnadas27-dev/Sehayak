@@ -10,6 +10,9 @@
     <!-- Main Application Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     
+    <!-- Application Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+    
     <!-- Plotly.js CDN for Accessible Visualizations -->
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
 
@@ -25,7 +28,9 @@
         <header class="navbar-wrapper">
             <nav class="navbar" aria-label="Main Navigation">
                 <div class="nav-brand">
-                    <span class="brand-logo-mark" aria-hidden="true">S</span>
+                    <a href="{{ url_for('index') }}" style="display: inline-flex; align-items: center; text-decoration: none; color: inherit;">
+                        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="SEHAYAK Logo" class="brand-logo-img" width="34" height="34">
+                    </a>
                     <div class="brand-text">
                         <h1>
                             <a href="{{ url_for('index') }}" style="color: inherit; text-decoration: none;">
@@ -39,49 +44,55 @@
                 <ul class="nav-menu">
                     <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
                     {% if session.get('user', {}).get('role') == 'principal' %}
-                        <li><a href="{{ url_for('principal_dashboard') }}" class="nav-link {% if request.endpoint == 'principal_dashboard' %}active{% endif %}">Principal Dashboard</a></li>
+                        <li><a href="{{ url_for('principal_dashboard') }}" class="nav-link {% if request.endpoint == 'principal_dashboard' %}active{% endif %}">Leadership</a></li>
                         <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">All Students</a></li>
                     {% elif session.get('user', {}).get('role') == 'counselor' %}
                         <li><a href="{{ url_for('counselor_dashboard') }}" class="nav-link {% if request.endpoint == 'counselor_dashboard' %}active{% endif %}">Counselor Workspace</a></li>
-                        <li><a href="{{ url_for('counselor_dashboard') }}#ld-roster" class="nav-link">LD Support Roster</a></li>
-                        <li><a href="{{ url_for('counselor_dashboard') }}#counselor-inbox" class="nav-link">Support Inbox</a></li>
-                        <li><a href="{{ url_for('counselor_dashboard') }}#exercise-publisher" class="nav-link">Study Exercises</a></li>
+                        <li><a href="{{ url_for('counselor_dashboard') }}#ld-roster" class="nav-link">LD Roster</a></li>
+                        <li><a href="{{ url_for('counselor_dashboard') }}#counselor-inbox" class="nav-link">Inbox</a></li>
+                        <li><a href="{{ url_for('counselor_dashboard') }}#exercise-publisher" class="nav-link">Exercises</a></li>
                     {% elif session.get('user', {}).get('role') == 'teacher' %}
-                        <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">My 100 Students</a></li>
+                        <li><a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">My Students</a></li>
                         <li><a href="{{ url_for('answer_sheets_list') }}" class="nav-link {% if request.endpoint in ['answer_sheets_list', 'upload_answer_sheet_view', 'view_answer_sheet'] %}active{% endif %}">Answer Sheets</a></li>
                         <li><a href="{{ url_for('question_papers_view') }}" class="nav-link {% if request.endpoint == 'question_papers_view' %}active{% endif %}">Question Papers</a></li>
                         <li><a href="{{ url_for('teacher_messages_view') }}" class="nav-link {% if request.endpoint == 'teacher_messages_view' %}active{% endif %}">Parent Queries</a></li>
-                        <li><a href="{{ url_for('upload_data') }}" class="nav-link {% if request.endpoint == 'upload_data' %}active{% endif %}">{{ t('nav_upload') }}</a></li>
+                        <li><a href="{{ url_for('upload_data') }}" class="nav-link {% if request.endpoint == 'upload_data' %}active{% endif %}">Upload</a></li>
                     {% elif session.get('user', {}).get('role') == 'parent' %}
                         <li><a href="{{ url_for('parent_view') }}" class="nav-link {% if request.endpoint == 'parent_view' %}active{% endif %}">Parent Portal</a></li>
-                        <li><a href="{{ url_for('take_test_view') }}" class="nav-link">30-Marks Tests</a></li>
+                        <li><a href="{{ url_for('take_test_view') }}" class="nav-link">30M Tests</a></li>
                     {% elif session.get('user', {}).get('role') == 'student' %}
                         <li><a href="{{ url_for('student_portal') }}" class="nav-link {% if request.endpoint == 'student_portal' %}active{% endif %}">{{ t('nav_practice') }}</a></li>
-                        <li><a href="{{ url_for('take_test_view') }}" class="nav-link {% if request.endpoint == 'take_test_view' %}active{% endif %}">Take 30-Marks Test</a></li>
+                        <li><a href="{{ url_for('take_test_view') }}" class="nav-link {% if request.endpoint == 'take_test_view' %}active{% endif %}">Take 30M Test</a></li>
                     {% else %}
                         <li><a href="{{ url_for('login') }}" class="nav-link">Sign In</a></li>
                     {% endif %}
                 </ul>
 
+                <!-- 3. User Actions & Utilities -->
                 <div class="nav-controls">
-                    <!-- Language Switcher -->
-                    <a href="{{ url_for('switch_language', lang='hi' if lang == 'en' else 'en') }}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;" title="Switch Language">
-                        {{ "हिन्दी" if lang == "en" else "English" }}
-                    </a>
+                    <!-- Utilities Cluster -->
+                    <div class="nav-tool-cluster">
+                        <a href="{{ url_for('switch_language', lang='hi' if lang == 'en' else 'en') }}" class="nav-tool-btn" title="Toggle Language">
+                            {{ "हिन्दी" if lang == "en" else "English" }}
+                        </a>
+                        <button id="a11y-toggle-btn" class="nav-tool-btn" aria-expanded="false" aria-controls="a11y-drawer-panel" title="{{ t('accessibility_title') }}">
+                            A11y
+                        </button>
+                    </div>
 
-                    <!-- Accessibility Panel Toggle -->
-                    <button id="a11y-toggle-btn" class="a11y-toolbar-toggle" aria-expanded="false" aria-controls="a11y-drawer-panel" title="{{ t('accessibility_title') }}">
-                        <span>{{ t('accessibility_title') }}</span>
-                    </button>
-
-                    <!-- Auth Actions -->
+                    <!-- Auth Profile Group -->
                     {% if session.get('user') %}
-                        <span style="font-size: 0.86rem; color: #01463C; margin-left: 0.5rem; font-weight: 800;">
-                            {{ session['user']['full_name'] }}
-                        </span>
-                        <a href="{{ url_for('logout') }}" class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.82rem;">{{ t('nav_logout') }}</a>
+                        <div class="nav-user-chip">
+                            <span class="user-chip-avatar">👩‍🏫</span>
+                            <span class="user-chip-name" title="{{ session['user']['full_name'] }}">
+                                {{ session['user']['full_name'].split('(')[0].strip() }}
+                            </span>
+                            <a href="{{ url_for('logout') }}" class="user-chip-logout" title="{{ t('nav_logout') }}">
+                                Logout
+                            </a>
+                        </div>
                     {% else %}
-                        <a href="{{ url_for('login') }}" class="btn btn-primary" style="padding: 0.35rem 0.95rem; font-size: 0.85rem;">{{ t('nav_login') }}</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary nav-btn-compact">{{ t('nav_login') }}</a>
                     {% endif %}
                 </div>
             </nav>
@@ -193,14 +204,12 @@
             {% block content %}{% endblock %}
         </main>
 
-        <!-- Footer & Ethical Statement -->
+        <!-- Footer & Institutional Attribution -->
         <footer class="footer">
-            <div style="max-width: 1200px; margin: 0 auto;">
-                <p style="margin-bottom: 0.35rem; font-weight: 600;">
-                    SEHAYAK (सहायक) - Ministry of Education Problem Statement #PSB152
-                </p>
-                <p style="font-size: 0.78rem; color: var(--text-muted);">
-                    {{ t('disclaimer_text') }}
+            <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; text-align: center; padding: 0.5rem 1rem;">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="SEHAYAK Logo" width="20" height="20" style="vertical-align: middle;">
+                <p style="font-weight: 700; font-size: 0.86rem; color: #01463C; margin: 0;">
+                    SEHAYAK (सहायक) &middot; Ministry of Education Problem Statement #PSB152 &bull; <span style="font-weight: 500; color: #537D75; font-size: 0.8rem;">Educational screening support, not clinical diagnosis.</span>
                 </p>
             </div>
         </footer>
